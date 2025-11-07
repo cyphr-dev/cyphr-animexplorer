@@ -241,67 +241,71 @@ export default function FavoritesAnimeList({
           Clear All
         </Button>
       </div>
-
-      {/* Search and Filters */}
-      <AnimeSearchBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search favorites..."
-        selectedType={selectedType}
-        onTypeChange={setSelectedType}
-        availableTypes={availableTypes}
-        showTypeFilter={true}
-        showStatusFilter={false}
-        showRatingFilter={false}
-        minScore={minScore}
-        onMinScoreChange={setMinScore}
-        showMinScoreFilter={true}
-        orderBy={orderBy}
-        onOrderByChange={setOrderBy}
-        sortOrder={sortOrder}
-        onSortOrderChange={setSortOrder}
-        sortOptions={favoritesSortOptions}
-        selectedGenres={selectedGenres}
-        onGenreToggle={handleGenreToggle}
-        availableGenres={availableGenres}
-        showGenreFilter={availableGenres.length > 0}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        showInfiniteScrollToggle={false}
-        showSfwToggle={false}
-        onClearFilters={clearFilters}
-        hasActiveFilters={hasActiveFilters}
-      />
-
-      {/* Results */}
-      {filteredAnimeList.length === 0 && favorites.length > 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground text-lg">
-            No favorites match your filters
-          </p>
-          <Button variant="outline" className="mt-4" onClick={clearFilters}>
-            Clear Filters
-          </Button>
+      <div className="grid grid-cols-10 gap-6">
+        {/* Search and Filters */}
+        <div className="col-span-2">
+          <AnimeSearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search favorites..."
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            availableTypes={availableTypes}
+            showTypeFilter={true}
+            showStatusFilter={false}
+            showRatingFilter={false}
+            minScore={minScore}
+            onMinScoreChange={setMinScore}
+            showMinScoreFilter={true}
+            orderBy={orderBy}
+            onOrderByChange={setOrderBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            sortOptions={favoritesSortOptions}
+            selectedGenres={selectedGenres}
+            onGenreToggle={handleGenreToggle}
+            availableGenres={availableGenres}
+            showGenreFilter={availableGenres.length > 0}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            showInfiniteScrollToggle={false}
+            showSfwToggle={false}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
         </div>
-      )}
-
-      {filteredAnimeList.length > 0 && (
-        <>
-          {viewMode === "grid" ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-              {filteredAnimeList.map((anime) => (
-                <AnimeCard key={anime.mal_id} anime={anime} />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredAnimeList.map((anime) => (
-                <AnimeListCard key={anime.mal_id} anime={anime} />
-              ))}
+        <div className="col-span-8">
+          {/* Results */}
+          {filteredAnimeList.length === 0 && favorites.length > 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">
+                No favorites match your filters
+              </p>
+              <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                Clear Filters
+              </Button>
             </div>
           )}
-        </>
-      )}
+
+          {filteredAnimeList.length > 0 && (
+            <>
+              {viewMode === "grid" ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {filteredAnimeList.map((anime) => (
+                    <AnimeCard key={anime.mal_id} anime={anime} />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredAnimeList.map((anime) => (
+                    <AnimeListCard key={anime.mal_id} anime={anime} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </>
   );
 }

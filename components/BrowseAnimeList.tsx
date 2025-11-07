@@ -50,13 +50,13 @@ export default function BrowseAnimeList({
     searchParams.get("q") || ""
   );
   const [selectedType, setSelectedType] = useState<string>(
-    searchParams.get("type") || ""
+    searchParams.get("type") || "none"
   );
   const [selectedStatus, setSelectedStatus] = useState<string>(
-    searchParams.get("status") || ""
+    searchParams.get("status") || "none"
   );
   const [selectedRating, setSelectedRating] = useState<string>(
-    searchParams.get("rating") || ""
+    searchParams.get("rating") || "none"
   );
   const [selectedGenres, setSelectedGenres] = useState<number[]>(
     searchParams.get("genres")
@@ -64,7 +64,7 @@ export default function BrowseAnimeList({
       : []
   );
   const [minScore, setMinScore] = useState<string>(
-    searchParams.get("min_score") || ""
+    searchParams.get("min_score") || "none"
   );
   const [orderBy, setOrderBy] = useState<string>(
     searchParams.get("order_by") || "popularity"
@@ -347,7 +347,7 @@ export default function BrowseAnimeList({
   return (
     <div className="grid md:grid-cols-10 gap-6">
       {/* Search and Filters */}
-      <div className="col-span-3">
+      <div className="col-span-2">
         <AnimeSearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -388,7 +388,7 @@ export default function BrowseAnimeList({
         />
       </div>
 
-      <div className="col-span-7">
+      <div className="col-span-8">
         {/* Results */}
         {animeList.length === 0 && !loading && (
           <AnimeEmptyState
@@ -408,7 +408,7 @@ export default function BrowseAnimeList({
         )}
 
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {animeList.map((anime) => (
               <AnimeCard key={anime.mal_id} anime={anime} />
             ))}

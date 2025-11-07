@@ -22,10 +22,9 @@ export default function AnimeEmptyState({
         <div className="flex flex-col items-center justify-center space-y-6 py-12">
           <FileQuestion className="w-24 h-24 text-muted-foreground" />
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold">{title}</h1>
-            <p className="text-muted-foreground text-lg">{description}</p>
+            <h2>{title}</h2>
+            <p>{description}</p>
           </div>
-
           {/* Additional Information Alert */}
           {children}
           <Link href="/">

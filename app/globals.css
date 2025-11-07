@@ -8,6 +8,28 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Typography tokens */
+  --fontSize-h1: var(--text-h1-size);
+  --fontSize-h2: var(--text-h2-size);
+  --fontSize-h3: var(--text-h3-size);
+  --fontSize-h4: var(--text-h4-size);
+  --fontSize-h5: var(--text-h5-size);
+  --fontSize-p: var(--text-p-size);
+
+  --lineHeight-h1: var(--text-h1-line-height);
+  --lineHeight-h2: var(--text-h2-line-height);
+  --lineHeight-h3: var(--text-h3-line-height);
+  --lineHeight-h4: var(--text-h4-line-height);
+  --lineHeight-h5: var(--text-h5-line-height);
+  --lineHeight-p: var(--text-p-line-height);
+
+  --fontWeight-h1: var(--text-h1-weight);
+  --fontWeight-h2: var(--text-h2-weight);
+  --fontWeight-h3: var(--text-h3-weight);
+  --fontWeight-h4: var(--text-h4-weight);
+  --fontWeight-h5: var(--text-h5-weight);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,6 +67,31 @@
 
 :root {
   --radius: 0.65rem;
+
+  /* Typography System */
+  --text-h1-size: 50px;
+  --text-h1-weight: 700;
+  --text-h1-line-height: auto;
+
+  --text-h2-size: 28px;
+  --text-h2-weight: 700;
+  --text-h2-line-height: 32px;
+
+  --text-h3-size: 23px;
+  --text-h3-weight: 700;
+  --text-h3-line-height: 25px;
+
+  --text-h4-size: 18px;
+  --text-h4-weight: 600;
+  --text-h4-line-height: auto;
+
+  --text-h5-size: 14px;
+  --text-h5-weight: 600;
+  --text-h5-line-height: auto;
+
+  --text-p-size: 12px;
+  --text-p-line-height: 20px;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -121,33 +168,79 @@
   }
 
   h1 {
-    font-size: 50px;
-    font-weight: 700;
+    font-size: var(--text-h1-size);
+    font-weight: var(--text-h1-weight);
+    line-height: var(--text-h1-line-height);
   }
 
   h2 {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 32px;
+    font-size: var(--text-h2-size);
+    font-weight: var(--text-h2-weight);
+    line-height: var(--text-h2-line-height);
   }
 
   h3 {
-    font-size: 23px;
-    font-weight: 700;
+    font-size: var(--text-h3-size);
+    font-weight: var(--text-h3-weight);
+    line-height: var(--text-h3-line-height);
   }
 
   h4 {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--text-h4-size);
+    font-weight: var(--text-h4-weight);
+    line-height: var(--text-h4-line-height);
   }
 
   h5 {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--text-h5-size);
+    font-weight: var(--text-h5-weight);
+    line-height: var(--text-h5-line-height);
   }
 
   p {
-    font-size: 10px;
-    line-height: 18px;
+    font-size: var(--text-p-size);
+    line-height: var(--text-p-line-height);
+  }
+
+  /* Reusable text utilities that match heading/paragraph styles */
+  .text-h1 {
+    font-size: var(--text-h1-size);
+    font-weight: var(--text-h1-weight);
+    line-height: var(--text-h1-line-height);
+  }
+
+  .text-h2 {
+    font-size: var(--text-h2-size);
+    font-weight: var(--text-h2-weight);
+    line-height: var(--text-h2-line-height);
+  }
+
+  .text-h3 {
+    font-size: var(--text-h3-size);
+    font-weight: var(--text-h3-weight);
+    line-height: var(--text-h3-line-height);
+  }
+
+  .text-h4 {
+    font-size: var(--text-h4-size);
+    font-weight: var(--text-h4-weight);
+    line-height: var(--text-h4-line-height);
+  }
+
+  .text-h5 {
+    font-size: var(--text-h5-size);
+    font-weight: var(--text-h5-weight);
+    line-height: var(--text-h5-line-height);
+  }
+
+  .text-p {
+    font-size: var(--text-p-size);
+    line-height: var(--text-p-line-height);
+  }
+
+  /* Legacy class for backward compatibility */
+  .input-text-p {
+    font-size: var(--text-p-size);
+    line-height: var(--text-p-line-height);
   }
 }

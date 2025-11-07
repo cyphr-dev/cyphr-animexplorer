@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "./ui/card";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 
 interface AnimeSearchBarProps {
   // Search and filters
@@ -171,7 +170,7 @@ export default function AnimeSearchBar({
             className="rounded-r-none w-1/2"
           >
             <Grid3x3 className="w-4 h-4 mr-2" />
-            Grid
+            <p>Grid</p>
           </Button>
           <Button
             type="button"
@@ -181,7 +180,7 @@ export default function AnimeSearchBar({
             className="rounded-l-none w-1/2"
           >
             <List className="w-4 h-4 mr-2" />
-            List
+            <p>List</p>
           </Button>
         </div>
         {/* Infinite Scroll Toggle (Browse only) */}
@@ -198,7 +197,7 @@ export default function AnimeSearchBar({
             }
           >
             <Infinity className="w-4 h-4 mr-2" />
-            Auto Load
+            <p>Auto Load</p>
           </Button>
         )}
         {/* SFW Toggle (Browse only) */}
@@ -321,7 +320,7 @@ export default function AnimeSearchBar({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full">
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
-                Genres
+                <p>Genres</p>
                 {selectedGenres.length > 0 && (
                   <Badge className="ml-2" variant="secondary">
                     {selectedGenres.length}
@@ -353,7 +352,7 @@ export default function AnimeSearchBar({
                 ))}
                 {filteredGenres.length === 0 && (
                   <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                    No genres found
+                    <p>No genres found</p>
                   </div>
                 )}
               </div>
@@ -367,19 +366,13 @@ export default function AnimeSearchBar({
             {selectedGenres.map((genreId) => {
               const genre = availableGenres.find((g) => g.mal_id === genreId);
               return (
-                <Badge key={genreId} variant="secondary">
-                  {genre?.name}
-                  <Button
-                    onClick={() => onGenreToggle(genreId)}
-                    variant={"outline"}
-                    size={"icon-sm"}
-                    className="p-0"
-                  >
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => onGenreToggle(genreId)}
-                    />
-                  </Button>
+                <Badge
+                  key={genreId}
+                  variant="default"
+                  onClick={() => onGenreToggle(genreId)}
+                >
+                  <p>{genre?.name}</p>
+                  <X className="w-3 h-3 cursor-pointer" />
                 </Badge>
               );
             })}
@@ -392,7 +385,7 @@ export default function AnimeSearchBar({
         {hasActiveFilters && (
           <Button onClick={onClearFilters}>
             <X className="w-4 h-4 mr-2" />
-            Clear Filters
+            <p>Clear Filters</p>
           </Button>
         )}
       </CardContent>

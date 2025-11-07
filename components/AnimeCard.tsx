@@ -57,7 +57,7 @@ export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
             <Button
               variant="secondary"
               size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 h-8 w-8"
+              className="absolute top-2 right-2 z-10 h-8 w-8"
               onClick={handleFavoriteClick}
             >
               <Heart
