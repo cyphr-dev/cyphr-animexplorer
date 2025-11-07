@@ -37,7 +37,7 @@ export default function AnimeCategorySection({
         </div>
         {viewAllLink && (
           <Link href={viewAllLink}>
-            <Button variant="ghost" className="group">
+            <Button className="group">
               View All
               <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>

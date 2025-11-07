@@ -128,7 +128,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AnimeHeader />
-          {children}
+          <div className="overflow-x-clip">{children}</div>
           <AnimeFooter />
         </ThemeProvider>
       </body>
