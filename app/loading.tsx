@@ -5,7 +5,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen bg-background -mt-17">
       {/* Hero Section Skeleton */}
-      <AnimeHero loading />
+      <AnimeHero />
 
       {/* Category Sections Skeleton */}
       <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
