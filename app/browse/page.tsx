@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { fetchAnimeList, fetchGenres } from "@/lib/api/jikan";
 import { AnimeListSkeleton } from "@/components/AnimeCard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle } from "lucide-react";
 import BrowseAnimeList from "@/components/BrowseAnimeList";
 import BackToTop from "@/components/BackToTop";
@@ -17,13 +17,11 @@ async function AnimeList() {
   } catch (error) {
     console.error("Error loading anime:", error);
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load anime data. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <AnimeEmptyState
+        title="Unable to Load Anime Data"
+        description="Failed to load anime data. Please try again later."
+        icon={<AlertCircle className="w-24 h-24 text-destructive" />}
+      />
     );
   }
 

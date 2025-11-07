@@ -409,7 +409,7 @@ export default function FavoritesAnimeList({
       </Card>
 
       {/* Results */}
-      {filteredAnimeList.length === 0 && (
+      {filteredAnimeList.length === 0 && favorites.length > 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground text-lg">
             No favorites match your filters

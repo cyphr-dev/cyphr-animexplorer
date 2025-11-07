@@ -7,6 +7,7 @@ import { AnimeListCard } from "@/components/AnimeListCard";
 import { fetchAnimeList } from "@/lib/api/jikan";
 import { Anime } from "@/lib/types/anime";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -610,14 +611,20 @@ export default function BrowseAnimeList({
 
       {/* Results */}
       {animeList.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground text-lg">No anime found</p>
+        <AnimeEmptyState
+          title="No Anime Found"
+          description={
+            hasActiveFilters
+              ? "Try adjusting your filters to see more results."
+              : "No anime available at the moment."
+          }
+        >
           {hasActiveFilters && (
-            <Button variant="outline" className="mt-4" onClick={clearFilters}>
+            <Button variant="outline" onClick={clearFilters}>
               Clear Filters
             </Button>
           )}
-        </div>
+        </AnimeEmptyState>
       )}
 
       <div className="pt-6">

@@ -1,121 +1,58 @@
-import { Suspense } from "react";
 import {
   fetchTopAnime,
   fetchCurrentlyAiring,
   fetchAnimeByTypeAndStatus,
 } from "@/lib/api/jikan";
 import AnimeCategorySection from "@/components/AnimeCategorySection";
-import { CategorySectionSkeleton } from "@/components/CategorySectionSkeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-// Fetch newest anime (currently airing)
-async function NewestAnimeSection() {
-  let data;
-  try {
-    data = await fetchCurrentlyAiring();
-  } catch (error) {
-    console.error("Error loading newest anime:", error);
-    return (
-      <Alert variant="destructive" className="mb-12">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>Failed to load newest anime.</AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <AnimeCategorySection
-      title="Newest"
-      description="Currently airing anime this season"
-      animeList={data}
-      viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
-    />
-  );
-}
-
-// Fetch most popular anime
-async function MostPopularSection() {
-  let data;
-  try {
-    data = await fetchTopAnime("bypopularity");
-  } catch (error) {
-    console.error("Error loading popular anime:", error);
-    return (
-      <Alert variant="destructive" className="mb-12">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>Failed to load popular anime.</AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <AnimeCategorySection
-      title="Most Popular"
-      description="Fan favorites and trending anime"
-      animeList={data}
-      viewAllLink="/browse?order_by=popularity&sort=asc"
-    />
-  );
-}
-
-// Fetch latest TV series
-async function LatestSeriesSection() {
-  let data;
-  try {
-    data = await fetchAnimeByTypeAndStatus("tv");
-  } catch (error) {
-    console.error("Error loading latest series:", error);
-    return (
-      <Alert variant="destructive" className="mb-12">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>Failed to load latest series.</AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <AnimeCategorySection
-      title="Latest Series"
-      description="Recent TV anime releases"
-      animeList={data}
-      viewAllLink="/browse?type=tv&order_by=start_date&sort=desc"
-    />
-  );
-}
-
-// Fetch latest movies
-async function LatestMoviesSection() {
-  let data;
-  try {
-    data = await fetchAnimeByTypeAndStatus("movie");
-  } catch (error) {
-    console.error("Error loading latest movies:", error);
-    return (
-      <Alert variant="destructive" className="mb-12">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>Failed to load latest movies.</AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <AnimeCategorySection
-      title="Latest Movies"
-      description="Recent anime movie releases"
-      animeList={data}
-      viewAllLink="/browse?type=movie&order_by=start_date&sort=desc"
-    />
-  );
-}
+// Add a delay utility to avoid rate limiting
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function Home() {
+  // Load categories sequentially to avoid rate limiting
+  let newestAnime = null;
+  let newestError = false;
+  try {
+    newestAnime = await fetchCurrentlyAiring();
+    await delay(1000); // Wait 1 second between requests
+  } catch (error) {
+    console.error("Error loading newest anime:", error);
+    newestError = true;
+  }
+
+  let popularAnime = null;
+  let popularError = false;
+  try {
+    popularAnime = await fetchTopAnime("bypopularity");
+    await delay(1000);
+  } catch (error) {
+    console.error("Error loading popular anime:", error);
+    popularError = true;
+  }
+
+  let latestSeries = null;
+  let seriesError = false;
+  try {
+    latestSeries = await fetchAnimeByTypeAndStatus("tv");
+    await delay(1000);
+  } catch (error) {
+    console.error("Error loading latest series:", error);
+    seriesError = true;
+  }
+
+  let latestMovies = null;
+  let moviesError = false;
+  try {
+    latestMovies = await fetchAnimeByTypeAndStatus("movie");
+  } catch (error) {
+    console.error("Error loading latest movies:", error);
+    moviesError = true;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
@@ -137,23 +74,55 @@ export default async function Home() {
         </header>
 
         {/* Category Sections */}
-        <div className="space-y-4">
-          <Suspense fallback={<CategorySectionSkeleton />}>
-            <NewestAnimeSection />
-          </Suspense>
+        {newestError && popularError && seriesError && moviesError ? (
+          <AnimeEmptyState
+            title="Unable to Load Content"
+            description="We're having trouble loading anime data. Please try refreshing the page."
+            icon={<AlertCircle className="w-24 h-24 text-muted-foreground" />}
+          />
+        ) : (
+          <div className="space-y-4">
+            {/* Newest Anime */}
+            {newestAnime && !newestError ? (
+              <AnimeCategorySection
+                title="Newest"
+                description="Currently airing anime this season"
+                animeList={newestAnime}
+                viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
+              />
+            ) : null}
 
-          <Suspense fallback={<CategorySectionSkeleton />}>
-            <MostPopularSection />
-          </Suspense>
+            {/* Most Popular */}
+            {popularAnime && !popularError ? (
+              <AnimeCategorySection
+                title="Most Popular"
+                description="Fan favorites and trending anime"
+                animeList={popularAnime}
+                viewAllLink="/browse?order_by=popularity&sort=asc"
+              />
+            ) : null}
 
-          <Suspense fallback={<CategorySectionSkeleton />}>
-            <LatestSeriesSection />
-          </Suspense>
+            {/* Latest Series */}
+            {latestSeries && !seriesError ? (
+              <AnimeCategorySection
+                title="Latest Series"
+                description="Recent TV anime releases"
+                animeList={latestSeries}
+                viewAllLink="/browse?type=tv&order_by=start_date&sort=desc"
+              />
+            ) : null}
 
-          <Suspense fallback={<CategorySectionSkeleton />}>
-            <LatestMoviesSection />
-          </Suspense>
-        </div>
+            {/* Latest Movies */}
+            {latestMovies && !moviesError ? (
+              <AnimeCategorySection
+                title="Latest Movies"
+                description="Recent anime movie releases"
+                animeList={latestMovies}
+                viewAllLink="/browse?type=movie&order_by=start_date&sort=desc"
+              />
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { fetchGenres } from "@/lib/api/jikan";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle } from "lucide-react";
 import { AnimeListSkeleton } from "@/components/AnimeCard";
 import FavoritesAnimeList from "@/components/FavoritesAnimeList";
@@ -13,13 +13,11 @@ async function FavoritesList() {
   } catch (error) {
     console.error("Error loading genres:", error);
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load genre data. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <AnimeEmptyState
+        title="Unable to Load Genre Data"
+        description="Failed to load genre data. Please try again later."
+        icon={<AlertCircle className="w-24 h-24 text-destructive" />}
+      />
     );
   }
 
