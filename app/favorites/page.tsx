@@ -1,9 +1,28 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { fetchGenres } from "@/lib/api/jikan";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle } from "lucide-react";
 import { AnimeListSkeleton } from "@/components/AnimeCard";
 import FavoritesAnimeList from "@/components/FavoritesAnimeList";
+
+export const metadata: Metadata = {
+  title: "My Favorites",
+  description:
+    "View and manage your favorite anime. Keep track of anime you want to watch or have enjoyed.",
+  openGraph: {
+    title: "My Favorites | Anime Explorer",
+    description:
+      "View and manage your favorite anime. Keep track of anime you want to watch or have enjoyed.",
+    url: "/favorites",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "My Favorites | Anime Explorer",
+    description:
+      "View and manage your favorite anime. Keep track of anime you want to watch or have enjoyed.",
+  },
+};
 
 async function FavoritesList() {
   let genres;

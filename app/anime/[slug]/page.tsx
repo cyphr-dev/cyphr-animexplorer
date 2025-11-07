@@ -1,5 +1,6 @@
 import { fetchAnimeById } from "@/lib/api/jikan";
 import { Anime } from "@/lib/types/anime";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
@@ -24,6 +25,70 @@ interface AnimeDetailsPageProps {
   }>;
 }
 
+export async function generateMetadata({
+  params,
+}: AnimeDetailsPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const animeId = parseInt(slug);
+
+  if (isNaN(animeId)) {
+    return {
+      title: "Anime Not Found",
+      description: "The anime you're looking for doesn't exist.",
+    };
+  }
+
+  try {
+    const anime: Anime = await fetchAnimeById(animeId);
+
+    if (!anime) {
+      return {
+        title: "Anime Not Found",
+        description: "The anime you're looking for doesn't exist.",
+      };
+    }
+
+    const title = anime.title || anime.title_english || "Anime Details";
+    const description =
+      anime.synopsis?.substring(0, 160) ||
+      `Explore details about ${title} on Anime Explorer.`;
+    const imageUrl =
+      anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title: `${title} | Anime Explorer`,
+        description,
+        url: `/anime/${animeId}`,
+        images: imageUrl
+          ? [
+              {
+                url: imageUrl,
+                width: 225,
+                height: 350,
+                alt: title,
+              },
+            ]
+          : [],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | Anime Explorer`,
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Error Loading Anime",
+      description: "There was an error loading the anime details.",
+    };
+  }
+}
+
 export default async function AnimeDetailsPage({
   params,
 }: AnimeDetailsPageProps) {
@@ -42,7 +107,7 @@ export default async function AnimeDetailsPage({
       notFound();
     }
     return (
-      <div className="min-h-screen bg-background">
+      <div className="container min-h-screen mx-auto bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
           {/* Breadcrumb Navigation */}
           <nav className="mb-6 text-sm text-muted-foreground">

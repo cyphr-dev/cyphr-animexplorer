@@ -1,10 +1,29 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { fetchAnimeList, fetchGenres } from "@/lib/api/jikan";
 import { AnimeListSkeleton } from "@/components/AnimeCard";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle } from "lucide-react";
 import BrowseAnimeList from "@/components/BrowseAnimeList";
 import BackToTop from "@/components/BackToTop";
+
+export const metadata: Metadata = {
+  title: "Browse All Anime",
+  description:
+    "Browse and filter through thousands of anime titles. Search by genre, type, status, and more to find your next anime to watch.",
+  openGraph: {
+    title: "Browse All Anime | Anime Explorer",
+    description:
+      "Browse and filter through thousands of anime titles. Search by genre, type, status, and more to find your next anime to watch.",
+    url: "/browse",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Browse All Anime | Anime Explorer",
+    description:
+      "Browse and filter through thousands of anime titles. Search by genre, type, status, and more to find your next anime to watch.",
+  },
+};
 
 async function AnimeList() {
   let data, genres;

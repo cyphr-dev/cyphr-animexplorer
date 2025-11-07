@@ -1,0 +1,9 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml

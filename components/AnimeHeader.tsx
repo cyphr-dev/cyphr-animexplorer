@@ -13,8 +13,8 @@ export default function AnimeHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="w-full flex px-4 justify-center sticky top-0 sm:top-3 z-50 container mx-auto">
-      <div className="flex justify-between w-full sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md">
+    <header className="w-full flex sm:px-4 justify-center sticky top-0 sm:top-3 z-50 container mx-auto">
+      <div className="flex justify-between w-full px-4 sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md">
         <Link
           href="/"
           className="font-bold text-lg sm:text-xl hover:opacity-80 transition-opacity"
@@ -31,7 +31,7 @@ export default function AnimeHeader() {
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
               <Home className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden md:inline">Home</span>
             </Button>
           </Link>
 
@@ -42,7 +42,7 @@ export default function AnimeHeader() {
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
               <Grid3x3 className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Browse</span>
+              <span className="hidden md:inline">Browse</span>
             </Button>
           </Link>
 
@@ -57,7 +57,7 @@ export default function AnimeHeader() {
                   pathname === "/favorites" ? "fill-current" : ""
                 }`}
               />
-              <span className="hidden sm:inline">Favorites</span>
+              <span className="hidden md:inline">Favorites</span>
               {favorites.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {favorites.length > 99 ? "99+" : favorites.length}
@@ -65,9 +65,7 @@ export default function AnimeHeader() {
               )}
             </Button>
           </Link>
-
           <ModeToggle />
-          <AnimeProfileAvatar />
         </div>
       </div>
     </header>
