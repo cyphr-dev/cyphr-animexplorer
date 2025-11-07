@@ -217,12 +217,12 @@ export default function AnimeSearchBar({
             {sfwMode ? (
               <>
                 <ShieldCheck className="w-4 h-4 mr-2" />
-                Safe Mode
+                <p>Safe Mode</p>
               </>
             ) : (
               <>
                 <ShieldOff className="w-4 h-4 mr-2" />
-                All Content
+                <p>All Content</p>
               </>
             )}
           </Button>

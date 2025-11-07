@@ -40,7 +40,7 @@ export default function AnimeCategorySection({
         {viewAllLink && (
           <Link href={viewAllLink}>
             <Button className="group">
-              View All
+              <p>View All</p>
               <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
@@ -60,8 +60,8 @@ export default function AnimeCategorySection({
               key={index}
               className={`pl-2 md:pl-4 ${
                 largerCards
-                  ? "basis-1/2 sm:basis-1/3 md:basis-1/3 lg:basis-1/5"
-                  : "basis-1/2 sm:basis-1/4 md:basis-1/4 lg:basis-1/6"
+                  ? "basis-1/3 sm:basis-1/4 md:basis-1/4 lg:basis-1/6"
+                  : "basis-1/3 sm:basis-1/5 md:basis-1/5 lg:basis-1/7"
               }`}
             >
               <AnimeCard anime={anime} />

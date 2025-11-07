@@ -11,7 +11,7 @@ export default function AnimeHero() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent ">
             AnimeXplorer
           </h1>
-          <p className="text-white text-lg md:text-xl max-w-2xl">
+          <p className="text-white text-sm md:text-lg max-w-lg">
             Discover and explore the world of anime. Uses{" "}
             <a
               href="https://jikan.moe/"
@@ -25,8 +25,10 @@ export default function AnimeHero() {
         </div>
 
         <Link href="/browse" className="w-fit">
-          <Button size="lg" className="text-lg px-8">
-            Browse All Anime
+          <Button size="lg" className="px-8">
+            <p className="text-white text-sm md:text-lg max-w-lg">
+              Browse All Anime
+            </p>
             <Sparkles className="w-5 h-5 ml-2" />
           </Button>
         </Link>

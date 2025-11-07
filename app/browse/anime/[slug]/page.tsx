@@ -151,7 +151,7 @@ export default async function AnimeDetailsPage({
       <div className="container min-h-screen mx-auto bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
           {/* Hero Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
             {/* Poster */}
             <div className="lg:col-span-2">
               <div className="sticky top-26 flex flex-col gap-4">
@@ -168,15 +168,15 @@ export default async function AnimeDetailsPage({
                 </nav>
                 {/* Title Section */}
                 <div className="flex flex-col gap-2">
-                  <h2>{anime.title}</h2>
+                  <h3>{anime.title}</h3>
                   {anime.title_japanese && (
-                    <p className="text-lg text-muted-foreground">
+                    <p className="text-muted-foreground">
                       {anime.title_japanese}
                     </p>
                   )}
                   {anime.title_english &&
                     anime.title_english !== anime.title && (
-                      <p className="text-xl text-muted-foreground mb-2">
+                      <p className="text-muted-foreground mb-2">
                         {anime.title_english}
                       </p>
                     )}
@@ -196,112 +196,95 @@ export default async function AnimeDetailsPage({
                     />
                   </div>
                 </Card>
-                {/* Quick Info */}
-                <Card>
-                  <CardContent className="">
-                    <div className="flex flex-col gap-4">
-                      {anime.type && (
-                        <div className="flex items-start gap-3">
-                          <Film className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Type
-                            </div>
-                            <div className="font-medium">{anime.type}</div>
-                          </div>
-                        </div>
-                      )}
-
-                      {anime.episodes && (
-                        <div className="flex items-start gap-3">
-                          <PlayCircle className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Episodes
-                            </div>
-                            <div className="font-medium">
-                              {anime.episodes}{" "}
-                              {anime.episodes === 1 ? "Episode" : "Episodes"}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {anime.status && (
-                        <div className="flex items-start gap-3">
-                          <Calendar className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Status
-                            </div>
-                            <div className="font-medium">{anime.status}</div>
-                          </div>
-                        </div>
-                      )}
-
-                      {anime.duration && (
-                        <div className="flex items-start gap-3">
-                          <Clock className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Duration
-                            </div>
-                            <div className="font-medium">{anime.duration}</div>
-                          </div>
-                        </div>
-                      )}
-
-                      {anime.aired?.string && (
-                        <div className="flex items-start gap-3 sm:col-span-2">
-                          <Calendar className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Aired
-                            </div>
-                            <div className="font-medium">
-                              {anime.aired.string}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {anime.rating && (
-                        <div className="flex items-start gap-3 sm:col-span-2">
-                          <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
-                          <div>
-                            <div className="text-sm text-muted-foreground">
-                              Rating
-                            </div>
-                            <div className="font-medium">{anime.rating}</div>
-                          </div>
-                        </div>
-                      )}
+                {/* Genres Section */}
+                {anime.genres && anime.genres.length > 0 && (
+                  <div>
+                    <div className="flex flex-wrap gap-2">
+                      {anime.genres.map((genre) => (
+                        <p
+                          key={genre.mal_id}
+                          className="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium hover:bg-primary/20 transition-colors"
+                        >
+                          {genre.name}
+                        </p>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                )}
+                {/* Quick Info */}
+                <div className="flex flex-col gap-4">
+                  {anime.type && (
+                    <div className="flex items-start gap-3">
+                      <Film className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Type</p>
+                        <p className="font-medium">{anime.type}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {anime.episodes && (
+                    <div className="flex items-start gap-3">
+                      <PlayCircle className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Episodes
+                        </p>
+                        <p className="font-medium">
+                          {anime.episodes}{" "}
+                          {anime.episodes === 1 ? "Episode" : "Episodes"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {anime.status && (
+                    <div className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Status</p>
+                        <p className="font-medium">{anime.status}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {anime.duration && (
+                    <div className="flex items-start gap-3">
+                      <Clock className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Duration</p>
+                        <p className="font-medium">{anime.duration}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {anime.aired?.string && (
+                    <div className="flex items-start gap-3 sm:col-span-2">
+                      <Calendar className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Aired</p>
+                        <p className="font-medium">{anime.aired.string}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {anime.rating && (
+                    <div className="flex items-start gap-3 sm:col-span-2">
+                      <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Rating</p>
+                        <p className="font-medium">{anime.rating}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Main Info */}
-            <div className="lg:col-span-6 space-y-6">
-              {/* Genres Section */}
-              {anime.genres && anime.genres.length > 0 && (
-                <div>
-                  <div className="flex flex-wrap gap-2">
-                    {anime.genres.map((genre) => (
-                      <span
-                        key={genre.mal_id}
-                        className="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium text-sm hover:bg-primary/20 transition-colors"
-                      >
-                        {genre.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
+            <div className="lg:col-span-8 space-y-6">
               {/* Rating and Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 {/* Score */}
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center text-center">
@@ -309,11 +292,11 @@ export default async function AnimeDetailsPage({
                     <div className="text-2xl font-bold">
                       {anime.score ? anime.score.toFixed(1) : "N/A"}
                     </div>
-                    <div className="text-sm text-muted-foreground">Score</div>
+                    <p className="text-muted-foreground">Score</p>
                     {anime.scored_by && (
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1">
                         {anime.scored_by.toLocaleString()} users
-                      </div>
+                      </p>
                     )}
                   </CardContent>
                 </Card>

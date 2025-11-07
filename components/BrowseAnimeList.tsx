@@ -345,9 +345,9 @@ export default function BrowseAnimeList({
   ];
 
   return (
-    <div className="grid md:grid-cols-7 gap-6">
+    <div className="grid md:grid-cols-10 gap-6">
       {/* Search and Filters */}
-      <div className="col-span-2">
+      <div className="col-span-3">
         <AnimeSearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -388,7 +388,7 @@ export default function BrowseAnimeList({
         />
       </div>
 
-      <div className="col-span-5">
+      <div className="col-span-7">
         {/* Results */}
         {animeList.length === 0 && !loading && (
           <AnimeEmptyState
@@ -408,7 +408,7 @@ export default function BrowseAnimeList({
         )}
 
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {animeList.map((anime) => (
               <AnimeCard key={anime.mal_id} anime={anime} />
             ))}
