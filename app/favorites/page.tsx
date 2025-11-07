@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { fetchGenres } from "@/lib/api/jikan";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import FavoritesAnimeList from "@/components/FavoritesAnimeList";
 import { AnimeListSkeleton } from "@/components/AnimeCard";
+import FavoritesAnimeList from "@/components/FavoritesAnimeList";
 
 async function FavoritesList() {
   let genres;
