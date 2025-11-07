@@ -16,11 +16,16 @@ import { useFavoritesStore } from "@/lib/store";
 
 interface AnimeCardProps {
   anime: Anime;
+  isLoading?: boolean;
 }
 
-export function AnimeCard({ anime }: AnimeCardProps) {
+export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
   const isAnimeFavorite = isFavorite(anime.mal_id);
+
+  if (isLoading) {
+    return <AnimeCardSkeleton />;
+  }
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();

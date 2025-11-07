@@ -56,7 +56,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background -mt-17">
       {/* Hero Section */}
-      <header className="flex flex-col h-[40dvh] align-middle justify-center bg-accent">
+      <header className="flex flex-col h-[55dvh] align-middle justify-center bg-accent">
         <div className="p-4 container mx-auto flex flex-col gap-12">
           <div className="flex flex-col gap-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent ">
@@ -86,16 +86,6 @@ export default async function Home() {
           />
         ) : (
           <div className="space-y-4">
-            {/* Newest Anime */}
-            {newestAnime && !newestError ? (
-              <AnimeCategorySection
-                title="Newest"
-                description="Currently airing anime this season"
-                animeList={newestAnime}
-                viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
-              />
-            ) : null}
-
             {/* Most Popular */}
             {popularAnime && !popularError ? (
               <AnimeCategorySection
@@ -103,6 +93,17 @@ export default async function Home() {
                 description="Fan favorites and trending anime"
                 animeList={popularAnime}
                 viewAllLink="/browse?order_by=popularity&sort=asc"
+                largerCards={true}
+              />
+            ) : null}
+
+            {/* Newest Anime */}
+            {newestAnime && !newestError ? (
+              <AnimeCategorySection
+                title="Latest"
+                description="Currently airing anime this season"
+                animeList={newestAnime}
+                viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
               />
             ) : null}
 

@@ -18,6 +18,7 @@ interface AnimeCategorySectionProps {
   description?: string;
   animeList: Anime[];
   viewAllLink?: string;
+  largerCards?: boolean;
 }
 
 export default function AnimeCategorySection({
@@ -25,6 +26,7 @@ export default function AnimeCategorySection({
   description,
   animeList,
   viewAllLink,
+  largerCards = false,
 }: AnimeCategorySectionProps) {
   return (
     <section className="mb-12">
@@ -56,7 +58,11 @@ export default function AnimeCategorySection({
           {animeList.map((anime, index) => (
             <CarouselItem
               key={index}
-              className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+              className={`pl-2 md:pl-4 ${
+                largerCards
+                  ? "basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                  : "basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+              }`}
             >
               <AnimeCard anime={anime} />
             </CarouselItem>
