@@ -63,10 +63,8 @@ export function AnimeCard({ anime }: AnimeCardProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="py-8">
-          <h3 className="font-semibold text-lg line-clamp-2 min-h-14">
-            {anime.title}
-          </h3>
+        <CardContent className="px-4 space-y-2">
+          <h3 className="line-clamp-1">{anime.title}</h3>
           <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
             {anime.type && (
               <span className="bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">
@@ -75,7 +73,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
             )}
           </div>
         </CardContent>
-        <CardFooter className="p-4 pt-0 flex items-center justify-between">
+        <CardFooter className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="font-semibold">

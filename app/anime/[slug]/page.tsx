@@ -43,7 +43,7 @@ export default async function AnimeDetailsPage({
     }
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
           {/* Breadcrumb Navigation */}
           <nav className="mb-6 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-colors">
@@ -254,6 +254,19 @@ export default async function AnimeDetailsPage({
           </div>
 
           <div className="space-y-6">
+            {/* Trailer Section */}
+            {anime.trailer?.embed_url && (
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                <iframe
+                  src={anime.trailer.embed_url}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={`${anime.title} Trailer`}
+                />
+              </div>
+            )}
+
             {/* Synopsis Section */}
             {anime.synopsis && (
               <Card>
@@ -282,28 +295,6 @@ export default async function AnimeDetailsPage({
                   <p className="text-muted-foreground leading-relaxed">
                     {anime.background}
                   </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Trailer Section */}
-            {anime.trailer?.embed_url && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <h3>Trailer</h3>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-                    <iframe
-                      src={anime.trailer.embed_url}
-                      className="absolute inset-0 w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title={`${anime.title} Trailer`}
-                    />
-                  </div>
                 </CardContent>
               </Card>
             )}

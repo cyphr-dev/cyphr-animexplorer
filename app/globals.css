@@ -121,7 +121,17 @@
   }
 
   h1 {
+    font-size: 50px;
+    font-weight: 700;
+  }
+
+  h2 {
     font-size: 32px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 23px;
     font-weight: 700;
   }
 }

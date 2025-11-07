@@ -24,6 +24,9 @@ import {
   Search,
   SlidersHorizontal,
   X,
+  Infinity,
+  ShieldCheck,
+  ShieldOff,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -61,6 +64,12 @@ export default function BrowseAnimeList({
   const [viewMode, setViewMode] = useState<"grid" | "list">(
     (searchParams.get("view") as "grid" | "list") || "grid"
   );
+  const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(
+    searchParams.get("infinite_scroll") !== "false"
+  );
+  const [sfwMode, setSfwMode] = useState(
+    searchParams.get("sfw") !== "false" // SFW enabled by default
+  );
 
   // Initialize filter states from URL params
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
@@ -90,6 +99,7 @@ export default function BrowseAnimeList({
   const [sortOrder, setSortOrder] = useState<string>(
     searchParams.get("sort") || "asc"
   );
+  const [genreSearchQuery, setGenreSearchQuery] = useState("");
 
   const observerTarget = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
@@ -175,6 +185,7 @@ export default function BrowseAnimeList({
             | "r"
             | "rx"
             | undefined,
+          sfw: sfwMode, // Filter out hentai content when enabled
           genres:
             selectedGenres.length > 0 ? selectedGenres.join(",") : undefined,
           min_score: minScoreValue,
@@ -231,6 +242,7 @@ export default function BrowseAnimeList({
       minScore,
       orderBy,
       sortOrder,
+      sfwMode,
     ]
   );
 
@@ -251,6 +263,7 @@ export default function BrowseAnimeList({
     minScore,
     orderBy,
     sortOrder,
+    sfwMode,
   ]);
 
   const loadMore = useCallback(async () => {
@@ -260,6 +273,9 @@ export default function BrowseAnimeList({
 
   // Intersection observer for infinite scroll
   useEffect(() => {
+    // Only set up observer if infinite scroll is enabled
+    if (!infiniteScrollEnabled) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
@@ -279,7 +295,7 @@ export default function BrowseAnimeList({
         observer.unobserve(currentTarget);
       }
     };
-  }, [loadMore, hasMore, loading]);
+  }, [loadMore, hasMore, loading, infiniteScrollEnabled]);
 
   const handleGenreToggle = (genreId: number) => {
     setSelectedGenres((prev) => {
@@ -320,6 +336,8 @@ export default function BrowseAnimeList({
       order_by: orderBy !== "popularity" ? orderBy : null,
       sort: sortOrder !== "asc" ? sortOrder : null,
       view: viewMode !== "grid" ? viewMode : null,
+      infinite_scroll: !infiniteScrollEnabled ? "false" : null,
+      sfw: !sfwMode ? "false" : null, // Only add to URL when disabled
     });
   }, [
     debouncedSearch,
@@ -331,6 +349,8 @@ export default function BrowseAnimeList({
     orderBy,
     sortOrder,
     viewMode,
+    infiniteScrollEnabled,
+    sfwMode,
     updateURLParams,
   ]);
 
@@ -345,11 +365,11 @@ export default function BrowseAnimeList({
   return (
     <>
       {/* Search and Filters */}
-      <Card className="mb-6 space-y-4 sticky top-25 bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-2xl items-center text-center z-50 backdrop-blur-md p-4">
+      <Card className="space-y-4 sticky top-25 bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-2xl items-center text-center z-50 backdrop-blur-md">
         <CardContent className="grid grid-cols-5 gap-3">
           {/* Search Bar */}
           <div className="flex flex-col sm:flex-row gap-3 col-span-5">
-            <div className="relative flex-1">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search anime..."
@@ -382,6 +402,40 @@ export default function BrowseAnimeList({
                 <List className="w-4 h-4" />
               </Button>
             </div>
+
+            {/* Infinite Scroll Toggle */}
+            <Button
+              type="button"
+              variant={infiniteScrollEnabled ? "default" : "outline"}
+              size="icon"
+              onClick={() => setInfiniteScrollEnabled(!infiniteScrollEnabled)}
+              title={
+                infiniteScrollEnabled
+                  ? "Disable infinite scroll"
+                  : "Enable infinite scroll"
+              }
+            >
+              <Infinity className="w-4 h-4" />
+            </Button>
+
+            {/* SFW Toggle */}
+            <Button
+              type="button"
+              variant={sfwMode ? "default" : "outline"}
+              size="icon"
+              onClick={() => setSfwMode(!sfwMode)}
+              title={
+                sfwMode
+                  ? "Safe for work mode (hentai filtered)"
+                  : "Show all content (including hentai)"
+              }
+            >
+              {sfwMode ? (
+                <ShieldCheck className="w-4 h-4" />
+              ) : (
+                <ShieldOff className="w-4 h-4" />
+              )}
+            </Button>
           </div>
 
           <div className="col-span-5 flex flex-row flex-wrap gap-2 items-center self-center">
@@ -484,18 +538,44 @@ export default function BrowseAnimeList({
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 max-h-[400px] overflow-y-auto">
+              <DropdownMenuContent className="w-56 max-h-[400px]">
                 <DropdownMenuLabel>Select Genres</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {initialGenres.map((genre) => (
-                  <DropdownMenuCheckboxItem
-                    key={genre.mal_id}
-                    checked={selectedGenres.includes(genre.mal_id)}
-                    onCheckedChange={() => handleGenreToggle(genre.mal_id)}
-                  >
-                    {genre.name}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                <div className="px-2 pb-2">
+                  <Input
+                    placeholder="Search genres..."
+                    value={genreSearchQuery}
+                    onChange={(e) => setGenreSearchQuery(e.target.value)}
+                    className="h-8"
+                  />
+                </div>
+                <DropdownMenuSeparator />
+                <div className="overflow-y-auto max-h-[280px]">
+                  {initialGenres
+                    .filter((genre) =>
+                      genre.name
+                        .toLowerCase()
+                        .includes(genreSearchQuery.toLowerCase())
+                    )
+                    .map((genre) => (
+                      <DropdownMenuCheckboxItem
+                        key={genre.mal_id}
+                        checked={selectedGenres.includes(genre.mal_id)}
+                        onCheckedChange={() => handleGenreToggle(genre.mal_id)}
+                      >
+                        {genre.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  {initialGenres.filter((genre) =>
+                    genre.name
+                      .toLowerCase()
+                      .includes(genreSearchQuery.toLowerCase())
+                  ).length === 0 && (
+                    <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                      No genres found
+                    </div>
+                  )}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -540,19 +620,21 @@ export default function BrowseAnimeList({
         </div>
       )}
 
-      {viewMode === "grid" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {animeList.map((anime) => (
-            <AnimeCard key={anime.mal_id} anime={anime} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {animeList.map((anime) => (
-            <AnimeListCard key={anime.mal_id} anime={anime} />
-          ))}
-        </div>
-      )}
+      <div className="pt-6">
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {animeList.map((anime) => (
+              <AnimeCard key={anime.mal_id} anime={anime} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {animeList.map((anime) => (
+              <AnimeListCard key={anime.mal_id} anime={anime} />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Loading indicator */}
       {loading && (
@@ -563,6 +645,18 @@ export default function BrowseAnimeList({
           </span>
         </div>
       )}
+
+      {/* Load More Button (when infinite scroll is disabled) */}
+      {!infiniteScrollEnabled &&
+        hasMore &&
+        !loading &&
+        animeList.length > 0 && (
+          <div className="flex justify-center py-8">
+            <Button onClick={loadMore} size="lg">
+              Load More
+            </Button>
+          </div>
+        )}
 
       {/* Error message */}
       {error && (
@@ -581,8 +675,8 @@ export default function BrowseAnimeList({
         </div>
       )}
 
-      {/* Intersection observer target */}
-      <div ref={observerTarget} className="h-4" />
+      {/* Intersection observer target (only when infinite scroll is enabled) */}
+      {infiniteScrollEnabled && <div ref={observerTarget} className="h-4" />}
     </>
   );
 }

@@ -9,6 +9,7 @@ export interface FetchAnimeParams {
   type?: "tv" | "movie" | "ova" | "special" | "ona" | "music";
   status?: "airing" | "complete" | "upcoming";
   rating?: "g" | "pg" | "pg13" | "r17" | "r" | "rx";
+  sfw?: boolean; // safe for work - filters out hentai content
   min_score?: number;
   max_score?: number;
   genres?: string; // comma separated genre IDs
@@ -38,6 +39,7 @@ export async function fetchAnimeList(
       type,
       status,
       rating,
+      sfw,
       min_score,
       max_score,
       genres,
@@ -53,6 +55,7 @@ export async function fetchAnimeList(
     if (type) url.searchParams.append("type", type);
     if (status) url.searchParams.append("status", status);
     if (rating) url.searchParams.append("rating", rating);
+    if (sfw !== undefined) url.searchParams.append("sfw", sfw.toString());
     if (min_score) url.searchParams.append("min_score", min_score.toString());
     if (max_score) url.searchParams.append("max_score", max_score.toString());
     if (genres) url.searchParams.append("genres", genres);
