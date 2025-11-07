@@ -107,7 +107,7 @@ export async function fetchTopAnime(
     if (filter) {
       url.searchParams.append("filter", filter);
     }
-    url.searchParams.append("limit", "5");
+    url.searchParams.append("limit", "10");
 
     const response = await fetch(url.toString(), {
       next: { revalidate: 3600 },
@@ -138,7 +138,7 @@ export async function fetchAnimeByTypeAndStatus(
     }
     url.searchParams.append("order_by", "start_date");
     url.searchParams.append("sort", "desc");
-    url.searchParams.append("limit", "5");
+    url.searchParams.append("limit", "10");
 
     const response = await fetch(url.toString(), {
       next: { revalidate: 3600 },
@@ -160,7 +160,7 @@ export async function fetchAnimeByTypeAndStatus(
 export async function fetchCurrentlyAiring() {
   try {
     const url = new URL(`${JIKAN_API_BASE_URL}/seasons/now`);
-    url.searchParams.append("limit", "5");
+    url.searchParams.append("limit", "10");
 
     const response = await fetch(url.toString(), {
       next: { revalidate: 3600 },

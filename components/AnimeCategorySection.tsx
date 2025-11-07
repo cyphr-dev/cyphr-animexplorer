@@ -2,6 +2,13 @@
 
 import { AnimeCard } from "@/components/AnimeCard";
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Anime } from "@/lib/types/anime";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -38,13 +45,28 @@ export default function AnimeCategorySection({
         )}
       </div>
 
-      <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+      <Carousel
+        opts={{
+          align: "start",
+          loop: false,
+        }}
+        className="w-full relative"
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
           {animeList.map((anime, index) => (
-            <AnimeCard key={index} anime={anime} />
+            <CarouselItem
+              key={index}
+              className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+            >
+              <AnimeCard anime={anime} />
+            </CarouselItem>
           ))}
+        </CarouselContent>
+        <div className="flex justify-end gap-2 mt-4">
+          <CarouselPrevious className="static translate-y-0" />
+          <CarouselNext className="static translate-y-0" />
         </div>
-      </div>
+      </Carousel>
     </section>
   );
 }
