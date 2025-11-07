@@ -9,36 +9,8 @@ import { Anime } from "@/lib/types/anime";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertCircle,
-  Loader2,
-  Grid3x3,
-  List,
-  Search,
-  SlidersHorizontal,
-  X,
-  Infinity,
-  ShieldCheck,
-  ShieldOff,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "./ui/card";
+import AnimeSearchBar from "@/components/AnimeSearchBar";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 interface BrowseAnimeListProps {
   initialData: Anime[];
@@ -100,7 +72,6 @@ export default function BrowseAnimeList({
   const [sortOrder, setSortOrder] = useState<string>(
     searchParams.get("sort") || "asc"
   );
-  const [genreSearchQuery, setGenreSearchQuery] = useState("");
 
   const observerTarget = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
@@ -355,281 +326,89 @@ export default function BrowseAnimeList({
     updateURLParams,
   ]);
 
-  const hasActiveFilters =
+  const hasActiveFilters = Boolean(
     searchQuery ||
-    selectedType ||
-    selectedStatus ||
-    selectedRating ||
-    selectedGenres.length > 0 ||
-    minScore;
+      selectedType ||
+      selectedStatus ||
+      selectedRating ||
+      selectedGenres.length > 0 ||
+      minScore
+  );
+
+  const browseSortOptions = [
+    { value: "popularity", label: "Popularity" },
+    { value: "score", label: "Score" },
+    { value: "title", label: "Title" },
+    { value: "start_date", label: "Start Date" },
+    { value: "end_date", label: "End Date" },
+    { value: "favorites", label: "Favorites" },
+  ];
 
   return (
-    <>
+    <div className="grid md:grid-cols-7 gap-6">
       {/* Search and Filters */}
-      <Card className="space-y-4 sticky top-25 bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-2xl items-center text-center z-50 backdrop-blur-md">
-        <CardContent className="grid grid-cols-5 gap-3">
-          {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 col-span-5">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search anime..."
-                value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchQuery(e.target.value)
-                }
-                className="pl-9"
-              />
-            </div>
+      <div className="col-span-2">
+        <AnimeSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search anime..."
+          selectedType={selectedType}
+          onTypeChange={setSelectedType}
+          showTypeFilter={true}
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          showStatusFilter={true}
+          selectedRating={selectedRating}
+          onRatingChange={setSelectedRating}
+          showRatingFilter={true}
+          minScore={minScore}
+          onMinScoreChange={setMinScore}
+          showMinScoreFilter={true}
+          orderBy={orderBy}
+          onOrderByChange={setOrderBy}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+          sortOptions={browseSortOptions}
+          selectedGenres={selectedGenres}
+          onGenreToggle={handleGenreToggle}
+          availableGenres={initialGenres}
+          showGenreFilter={true}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          infiniteScrollEnabled={infiniteScrollEnabled}
+          onInfiniteScrollToggle={() =>
+            setInfiniteScrollEnabled(!infiniteScrollEnabled)
+          }
+          showInfiniteScrollToggle={true}
+          sfwMode={sfwMode}
+          onSfwToggle={() => setSfwMode(!sfwMode)}
+          showSfwToggle={true}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
 
-            {/* View Toggle */}
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <Button
-                type="button"
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button
-                type="button"
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className="rounded-l-none"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Infinite Scroll Toggle */}
-            <Button
-              type="button"
-              variant={infiniteScrollEnabled ? "default" : "outline"}
-              size="icon"
-              onClick={() => setInfiniteScrollEnabled(!infiniteScrollEnabled)}
-              title={
-                infiniteScrollEnabled
-                  ? "Disable infinite scroll"
-                  : "Enable infinite scroll"
-              }
-            >
-              <Infinity className="w-4 h-4" />
-            </Button>
-
-            {/* SFW Toggle */}
-            <Button
-              type="button"
-              variant={sfwMode ? "default" : "outline"}
-              size="icon"
-              onClick={() => setSfwMode(!sfwMode)}
-              title={
-                sfwMode
-                  ? "Safe for work mode (hentai filtered)"
-                  : "Show all content (including hentai)"
-              }
-            >
-              {sfwMode ? (
-                <ShieldCheck className="w-4 h-4" />
-              ) : (
-                <ShieldOff className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-
-          <div className="col-span-5 flex flex-row flex-wrap gap-2 items-center self-center">
-            {/* Type Filter */}
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">All Types</SelectItem>
-                <SelectItem value="tv">TV</SelectItem>
-                <SelectItem value="movie">Movie</SelectItem>
-                <SelectItem value="ova">OVA</SelectItem>
-                <SelectItem value="special">Special</SelectItem>
-                <SelectItem value="ona">ONA</SelectItem>
-                <SelectItem value="music">Music</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Status Filter */}
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">All Status</SelectItem>
-                <SelectItem value="airing">Airing</SelectItem>
-                <SelectItem value="complete">Complete</SelectItem>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Rating Filter */}
-            <Select value={selectedRating} onValueChange={setSelectedRating}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Rating" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">All Ratings</SelectItem>
-                <SelectItem value="g">G - All Ages</SelectItem>
-                <SelectItem value="pg">PG - Children</SelectItem>
-                <SelectItem value="pg13">PG-13 - Teens 13+</SelectItem>
-                <SelectItem value="r17">R - 17+</SelectItem>
-                <SelectItem value="r">R+ - Mild Nudity</SelectItem>
-                <SelectItem value="rx">Rx - Hentai</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Min Score */}
-            <Select value={minScore} onValueChange={setMinScore}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Min Score" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Any Score</SelectItem>
-                <SelectItem value="5">5.0+</SelectItem>
-                <SelectItem value="6">6.0+</SelectItem>
-                <SelectItem value="7">7.0+</SelectItem>
-                <SelectItem value="8">8.0+</SelectItem>
-                <SelectItem value="9">9.0+</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort By */}
-            <Select value={orderBy} onValueChange={setOrderBy}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="popularity">Popularity</SelectItem>
-                <SelectItem value="score">Score</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="start_date">Start Date</SelectItem>
-                <SelectItem value="end_date">End Date</SelectItem>
-                <SelectItem value="favorites">Favorites</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort Order */}
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Order" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">Ascending</SelectItem>
-                <SelectItem value="desc">Descending</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Genre Filter Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <SlidersHorizontal className="w-4 h-4 mr-2" />
-                  Genres
-                  {selectedGenres.length > 0 && (
-                    <Badge className="ml-2" variant="secondary">
-                      {selectedGenres.length}
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 max-h-[400px]">
-                <DropdownMenuLabel>Select Genres</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <div className="px-2 pb-2">
-                  <Input
-                    placeholder="Search genres..."
-                    value={genreSearchQuery}
-                    onChange={(e) => setGenreSearchQuery(e.target.value)}
-                    className="h-8"
-                  />
-                </div>
-                <DropdownMenuSeparator />
-                <div className="overflow-y-auto max-h-[280px]">
-                  {initialGenres
-                    .filter((genre) =>
-                      genre.name
-                        .toLowerCase()
-                        .includes(genreSearchQuery.toLowerCase())
-                    )
-                    .map((genre) => (
-                      <DropdownMenuCheckboxItem
-                        key={genre.mal_id}
-                        checked={selectedGenres.includes(genre.mal_id)}
-                        onCheckedChange={() => handleGenreToggle(genre.mal_id)}
-                      >
-                        {genre.name}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  {initialGenres.filter((genre) =>
-                    genre.name
-                      .toLowerCase()
-                      .includes(genreSearchQuery.toLowerCase())
-                  ).length === 0 && (
-                    <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                      No genres found
-                    </div>
-                  )}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Clear Filters */}
+      <div className="col-span-5">
+        {/* Results */}
+        {animeList.length === 0 && !loading && (
+          <AnimeEmptyState
+            title="No Anime Found"
+            description={
+              hasActiveFilters
+                ? "Try adjusting your filters to see more results."
+                : "No anime available at the moment."
+            }
+          >
             {hasActiveFilters && (
-              <Button variant="ghost" onClick={clearFilters}>
-                <X className="w-4 h-4 mr-2" />
+              <Button variant="outline" onClick={clearFilters}>
                 Clear Filters
               </Button>
             )}
+          </AnimeEmptyState>
+        )}
 
-            {/* Active Filters Display */}
-            {selectedGenres.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {selectedGenres.map((genreId) => {
-                  const genre = initialGenres.find((g) => g.mal_id === genreId);
-                  return (
-                    <Badge key={genreId} variant="secondary">
-                      {genre?.name}
-                      <X
-                        className="w-3 h-3 ml-1 cursor-pointer"
-                        onClick={() => handleGenreToggle(genreId)}
-                      />
-                    </Badge>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Results */}
-      {animeList.length === 0 && !loading && (
-        <AnimeEmptyState
-          title="No Anime Found"
-          description={
-            hasActiveFilters
-              ? "Try adjusting your filters to see more results."
-              : "No anime available at the moment."
-          }
-        >
-          {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
-            </Button>
-          )}
-        </AnimeEmptyState>
-      )}
-
-      <div className="pt-6">
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {animeList.map((anime) => (
               <AnimeCard key={anime.mal_id} anime={anime} />
             ))}
@@ -641,49 +420,49 @@ export default function BrowseAnimeList({
             ))}
           </div>
         )}
-      </div>
 
-      {/* Loading indicator */}
-      {loading && (
-        <div className="flex justify-center items-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <span className="ml-2 text-muted-foreground">
-            Loading more anime...
-          </span>
-        </div>
-      )}
-
-      {/* Load More Button (when infinite scroll is disabled) */}
-      {!infiniteScrollEnabled &&
-        hasMore &&
-        !loading &&
-        animeList.length > 0 && (
-          <div className="flex justify-center py-8">
-            <Button onClick={loadMore} size="lg">
-              Load More
-            </Button>
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <span className="ml-2 text-muted-foreground">
+              Loading more anime...
+            </span>
           </div>
         )}
 
-      {/* Error message */}
-      {error && (
-        <Alert variant="destructive" className="mt-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+        {/* Load More Button (when infinite scroll is disabled) */}
+        {!infiniteScrollEnabled &&
+          hasMore &&
+          !loading &&
+          animeList.length > 0 && (
+            <div className="flex justify-center py-8">
+              <Button onClick={loadMore} size="lg">
+                Load More
+              </Button>
+            </div>
+          )}
 
-      {/* End of content message */}
-      {!hasMore && !loading && animeList.length > 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>You&apos;ve reached the end! 🎉</p>
-          <p className="text-sm mt-2">Loaded {animeList.length} anime</p>
-        </div>
-      )}
+        {/* Error message */}
+        {error && (
+          <Alert variant="destructive" className="mt-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {/* Intersection observer target (only when infinite scroll is enabled) */}
-      {infiniteScrollEnabled && <div ref={observerTarget} className="h-4" />}
-    </>
+        {/* End of content message */}
+        {!hasMore && !loading && animeList.length > 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>You&apos;ve reached the end! 🎉</p>
+            <p className="text-sm mt-2">Loaded {animeList.length} anime</p>
+          </div>
+        )}
+
+        {/* Intersection observer target (only when infinite scroll is enabled) */}
+        {infiniteScrollEnabled && <div ref={observerTarget} className="h-4" />}
+      </div>
+    </div>
   );
 }

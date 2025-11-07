@@ -5,33 +5,8 @@ import { AnimeCard } from "@/components/AnimeCard";
 import { AnimeListCard } from "@/components/AnimeListCard";
 import { useFavoritesStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Grid3x3,
-  List,
-  Search,
-  SlidersHorizontal,
-  X,
-  Trash2,
-  Heart,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "./ui/card";
+import AnimeSearchBar from "@/components/AnimeSearchBar";
+import { Trash2, Heart } from "lucide-react";
 import { Anime } from "@/lib/types/anime";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import Link from "next/link";
@@ -187,8 +162,9 @@ export default function FavoritesAnimeList({
     setMinScore("");
   };
 
-  const hasActiveFilters =
-    searchQuery || selectedType || selectedGenres.length > 0 || minScore;
+  const hasActiveFilters = Boolean(
+    searchQuery || selectedType || selectedGenres.length > 0 || minScore
+  );
 
   // Get available genres from favorites
   const availableGenres = useMemo(() => {
@@ -205,8 +181,22 @@ export default function FavoritesAnimeList({
     favoriteAnimeList.forEach((anime) => {
       if (anime.type) types.add(anime.type.toLowerCase());
     });
-    return Array.from(types);
+    return [
+      { value: "none", label: "All Types" },
+      ...Array.from(types).map((type) => ({
+        value: type,
+        label: type.toUpperCase(),
+      })),
+    ];
   }, [favoriteAnimeList]);
+
+  const favoritesSortOptions = [
+    { value: "addedAt", label: "Date Added" },
+    { value: "score", label: "Score" },
+    { value: "title", label: "Title" },
+    { value: "episodes", label: "Episodes" },
+    { value: "type", label: "Type" },
+  ];
 
   if (favorites.length === 0) {
     return (
@@ -253,160 +243,35 @@ export default function FavoritesAnimeList({
       </div>
 
       {/* Search and Filters */}
-      <Card className="mb-6 space-y-4 sticky top-28 bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-2xl items-center text-center z-50 backdrop-blur-md p-4">
-        <CardContent>
-          {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search favorites..."
-                value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchQuery(e.target.value)
-                }
-                className="pl-9"
-              />
-            </div>
-
-            {/* View Toggle */}
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <Button
-                type="button"
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button
-                type="button"
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className="rounded-l-none"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Filters Row */}
-          <div className="flex flex-wrap gap-3">
-            {/* Type Filter */}
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">All Types</SelectItem>
-                {availableTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type.toUpperCase()}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Min Score */}
-            <Select value={minScore} onValueChange={setMinScore}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Min Score" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Any Score</SelectItem>
-                <SelectItem value="5">5.0+</SelectItem>
-                <SelectItem value="6">6.0+</SelectItem>
-                <SelectItem value="7">7.0+</SelectItem>
-                <SelectItem value="8">8.0+</SelectItem>
-                <SelectItem value="9">9.0+</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort By */}
-            <Select value={orderBy} onValueChange={setOrderBy}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="addedAt">Date Added</SelectItem>
-                <SelectItem value="score">Score</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="episodes">Episodes</SelectItem>
-                <SelectItem value="type">Type</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort Order */}
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Order" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">Ascending</SelectItem>
-                <SelectItem value="desc">Descending</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Genre Filter Dropdown */}
-            {availableGenres.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    <SlidersHorizontal className="w-4 h-4 mr-2" />
-                    Genres
-                    {selectedGenres.length > 0 && (
-                      <Badge className="ml-2" variant="secondary">
-                        {selectedGenres.length}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 max-h-[400px] overflow-y-auto">
-                  <DropdownMenuLabel>Select Genres</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {availableGenres.map((genre) => (
-                    <DropdownMenuCheckboxItem
-                      key={genre.mal_id}
-                      checked={selectedGenres.includes(genre.mal_id)}
-                      onCheckedChange={() => handleGenreToggle(genre.mal_id)}
-                    >
-                      {genre.name}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <Button variant="ghost" onClick={clearFilters}>
-                <X className="w-4 h-4 mr-2" />
-                Clear Filters
-              </Button>
-            )}
-          </div>
-
-          {/* Active Filters Display */}
-          {selectedGenres.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {selectedGenres.map((genreId) => {
-                const genre = initialGenres.find((g) => g.mal_id === genreId);
-                return (
-                  <Badge key={genreId} variant="secondary">
-                    {genre?.name}
-                    <X
-                      className="w-3 h-3 ml-1 cursor-pointer"
-                      onClick={() => handleGenreToggle(genreId)}
-                    />
-                  </Badge>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <AnimeSearchBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search favorites..."
+        selectedType={selectedType}
+        onTypeChange={setSelectedType}
+        availableTypes={availableTypes}
+        showTypeFilter={true}
+        showStatusFilter={false}
+        showRatingFilter={false}
+        minScore={minScore}
+        onMinScoreChange={setMinScore}
+        showMinScoreFilter={true}
+        orderBy={orderBy}
+        onOrderByChange={setOrderBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
+        sortOptions={favoritesSortOptions}
+        selectedGenres={selectedGenres}
+        onGenreToggle={handleGenreToggle}
+        availableGenres={availableGenres}
+        showGenreFilter={availableGenres.length > 0}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        showInfiniteScrollToggle={false}
+        showSfwToggle={false}
+        onClearFilters={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
 
       {/* Results */}
       {filteredAnimeList.length === 0 && favorites.length > 0 && (

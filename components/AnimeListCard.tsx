@@ -28,10 +28,10 @@ export function AnimeListCard({ anime }: AnimeListCardProps) {
   };
 
   return (
-    <Link href={`/anime/${anime.mal_id}`}>
+    <Link href={`/browse/anime/${anime.mal_id}`}>
       <Card className="overflow-hidden transition-all hover:shadow-lg cursor-pointer mb-4">
         <CardContent className="p-0">
-          <div className="flex flex-col sm:flex-row gap-4 p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             {/* Image */}
             <div className="relative w-full sm:w-32 aspect-3/4 sm:aspect-auto sm:h-44 shrink-0 overflow-hidden rounded-md bg-muted">
               <Image

@@ -5,9 +5,8 @@ import {
 } from "@/lib/api/jikan";
 import AnimeCategorySection from "@/components/AnimeCategorySection";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
-import { AlertCircle, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import AnimeHero from "@/components/AnimeHero";
+import { AlertCircle } from "lucide-react";
 
 // Add a delay utility to avoid rate limiting
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,26 +55,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background -mt-17">
       {/* Hero Section */}
-      <header className="flex flex-col h-[55dvh] align-middle justify-center bg-accent">
-        <div className="p-4 container mx-auto flex flex-col gap-12">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent ">
-              AnimeXplorer
-            </h1>
-            <p className=" text-lg md:text-xl max-w-2xl">
-              Discover and explore the world of anime. From the latest releases
-              to timeless classics.
-            </p>
-          </div>
-
-          <Link href="/browse" className="w-fit">
-            <Button size="lg" className="text-lg px-8">
-              Browse All Anime
-              <Sparkles className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </header>
+      <AnimeHero />
       <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
         {/* Category Sections */}
         {newestError && popularError && seriesError && moviesError ? (

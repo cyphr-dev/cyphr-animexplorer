@@ -68,8 +68,8 @@ export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="px-4 space-y-2">
-          <h3 className="line-clamp-1">{anime.title}</h3>
+        <CardContent className="px-4 space-y-1">
+          <h4 className="line-clamp-1">{anime.title}</h4>
           <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
             {anime.type && (
               <span className="bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">
@@ -87,7 +87,7 @@ export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
           </div>
           {anime.episodes && (
             <span className="text-sm text-muted-foreground">
-              {anime.episodes} {anime.episodes === 1 ? "Episode" : "Episodes"}
+              {anime.episodes} {anime.episodes === 1 ? "Ep" : "Eps"}
             </span>
           )}
         </CardFooter>
