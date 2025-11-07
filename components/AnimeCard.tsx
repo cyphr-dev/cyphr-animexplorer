@@ -34,7 +34,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
   };
 
   return (
-    <Link href={`/anime/${anime.mal_id}`}>
+    <Link href={`/browse/anime/${anime.mal_id}`}>
       <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer relative group p-0 gap-0">
         <CardHeader className="p-0">
           <div className="relative aspect-3/4 w-full overflow-hidden bg-muted">

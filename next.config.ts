@@ -4,8 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
-      new URL("https://cdn.myanimelist.net/images/**"),
-      new URL("https://cdn.myanimelist.net/img/**"),
+      {
+        protocol: "https",
+        hostname: "cdn.myanimelist.net",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

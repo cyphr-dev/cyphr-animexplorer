@@ -198,3 +198,83 @@ export async function fetchGenres() {
     throw error;
   }
 }
+
+// Fetch anime relations (sequels, prequels, etc.)
+export async function fetchAnimeRelations(id: number) {
+  try {
+    const url = `${JIKAN_API_BASE_URL}/anime/${id}/relations`;
+
+    const response = await fetch(url, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch anime relations: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching anime relations:", error);
+    throw error;
+  }
+}
+
+// Fetch anime characters
+export async function fetchAnimeCharacters(id: number) {
+  try {
+    const url = `${JIKAN_API_BASE_URL}/anime/${id}/characters`;
+
+    const response = await fetch(url, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch anime characters: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching anime characters:", error);
+    throw error;
+  }
+}
+
+// Fetch multiple anime by IDs (for getting images of related anime)
+export async function fetchAnimeByIds(ids: number[]) {
+  try {
+    // Fetch anime data sequentially with delays to avoid rate limiting
+    const animeData = [];
+
+    for (const id of ids) {
+      try {
+        const response = await fetch(`${JIKAN_API_BASE_URL}/anime/${id}`, {
+          next: { revalidate: 3600 },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data) {
+            animeData.push(data.data);
+          }
+        }
+
+        // Add a small delay between requests to avoid rate limiting
+        await new Promise((resolve) => setTimeout(resolve, 350));
+      } catch (error) {
+        console.error(`Error fetching anime ${id}:`, error);
+        // Continue with next anime even if one fails
+      }
+    }
+
+    return animeData;
+  } catch (error) {
+    console.error("Error fetching anime by IDs:", error);
+    return [];
+  }
+}

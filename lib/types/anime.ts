@@ -77,3 +77,49 @@ export interface JikanResponse {
   pagination: PaginationInfo;
   data: Anime[];
 }
+
+export interface AnimeRelationEntry {
+  mal_id: number;
+  type: string;
+  name: string;
+  url: string;
+}
+
+export interface AnimeRelation {
+  relation: string;
+  entry: AnimeRelationEntry[];
+}
+
+export interface CharacterImage {
+  jpg: {
+    image_url: string;
+  };
+  webp: {
+    image_url: string;
+    small_image_url: string;
+  };
+}
+
+export interface Character {
+  character: {
+    mal_id: number;
+    url: string;
+    images: CharacterImage;
+    name: string;
+  };
+  role: string;
+  favorites: number;
+  voice_actors: Array<{
+    person: {
+      mal_id: number;
+      url: string;
+      images: {
+        jpg: {
+          image_url: string;
+        };
+      };
+      name: string;
+    };
+    language: string;
+  }>;
+}

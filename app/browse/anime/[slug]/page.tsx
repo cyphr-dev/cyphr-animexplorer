@@ -1,5 +1,10 @@
-import { fetchAnimeById } from "@/lib/api/jikan";
-import { Anime } from "@/lib/types/anime";
+import {
+  fetchAnimeById,
+  fetchAnimeRelations,
+  fetchAnimeByIds,
+  fetchAnimeCharacters,
+} from "@/lib/api/jikan";
+import { Anime, AnimeRelation, Character } from "@/lib/types/anime";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -13,9 +18,10 @@ import {
   Users,
   PlayCircle,
   AlertCircle,
-  Car,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AnimeCard } from "@/components/AnimeCard";
 import Link from "next/link";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 
@@ -81,7 +87,7 @@ export async function generateMetadata({
         images: imageUrl ? [imageUrl] : [],
       },
     };
-  } catch (error) {
+  } catch {
     return {
       title: "Error Loading Anime",
       description: "There was an error loading the anime details.",
@@ -106,6 +112,41 @@ export default async function AnimeDetailsPage({
     if (!anime) {
       notFound();
     }
+
+    // Fetch relations data
+    let relations: AnimeRelation[] | null = null;
+    let relatedAnimeData: Anime[] = [];
+    try {
+      relations = await fetchAnimeRelations(animeId);
+
+      // Extract all anime IDs from relations
+      if (relations && relations.length > 0) {
+        const animeIds = relations
+          .flatMap((rel) => rel.entry)
+          .filter((entry) => entry.type === "anime")
+          .map((entry) => entry.mal_id);
+
+        // Fetch anime data for images
+        if (animeIds.length > 0) {
+          const fetchedData = await fetchAnimeByIds(animeIds);
+          // Filter out null/undefined values
+          relatedAnimeData = fetchedData.filter(
+            (anime): anime is Anime => anime !== null && anime !== undefined
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching relations:", error);
+    }
+
+    // Fetch characters data
+    let characters: Character[] = [];
+    try {
+      characters = await fetchAnimeCharacters(animeId);
+    } catch (error) {
+      console.error("Error fetching characters:", error);
+    }
+
     return (
       <div className="container min-h-screen mx-auto bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
@@ -122,7 +163,7 @@ export default async function AnimeDetailsPage({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Poster */}
             <div className="lg:col-span-1">
-              <Card className="overflow-hidden sticky top-26">
+              <Card className="overflow-hidden sticky top-26 p-0">
                 <div className="relative aspect-3/4 w-full">
                   <Image
                     src={
@@ -404,6 +445,184 @@ export default async function AnimeDetailsPage({
                 </div>
               </CardContent>
             </Card>
+
+            {/* Characters Section */}
+            {characters && characters.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <h3>Characters & Voice Actors</h3>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {characters.slice(0, 12).map((char) => (
+                      <div
+                        key={char.character.mal_id}
+                        className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        {/* Character Info */}
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
+                            <Image
+                              src={
+                                char.character.images.webp.image_url ||
+                                char.character.images.jpg.image_url
+                              }
+                              alt={char.character.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <Link
+                              href={char.character.url}
+                              target="_blank"
+                              className="font-medium hover:text-primary transition-colors line-clamp-1"
+                            >
+                              {char.character.name}
+                            </Link>
+                            <p className="text-sm text-muted-foreground">
+                              {char.role}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Voice Actor Info */}
+                        {char.voice_actors && char.voice_actors.length > 0 && (
+                          <div className="flex items-center gap-3 flex-1 justify-end">
+                            <div className="text-right min-w-0">
+                              <Link
+                                href={char.voice_actors[0].person.url}
+                                target="_blank"
+                                className="font-medium hover:text-primary transition-colors line-clamp-1 block"
+                              >
+                                {char.voice_actors[0].person.name}
+                              </Link>
+                              <p className="text-sm text-muted-foreground">
+                                {char.voice_actors[0].language}
+                              </p>
+                            </div>
+                            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
+                              <Image
+                                src={
+                                  char.voice_actors[0].person.images.jpg
+                                    .image_url
+                                }
+                                alt={char.voice_actors[0].person.name}
+                                fill
+                                className="object-cover"
+                                sizes="64px"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            {/* Relations Section - Seasons, Sequels, Prequels, etc. */}
+            {relations &&
+              relations.length > 0 &&
+              relations.some((rel) =>
+                rel.entry.some((entry) => entry.type === "anime")
+              ) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <h3>Related Anime</h3>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs
+                      defaultValue={
+                        relations.find((rel) =>
+                          rel.entry.some((entry) => entry.type === "anime")
+                        )?.relation
+                      }
+                      className="w-full"
+                    >
+                      <TabsList className="w-full justify-start flex-wrap h-auto">
+                        {relations.map((relation, index) => {
+                          const animeEntries = relation.entry.filter(
+                            (entry) => entry.type === "anime"
+                          );
+                          if (animeEntries.length === 0) return null;
+
+                          return (
+                            <TabsTrigger
+                              key={index}
+                              value={relation.relation}
+                              className="capitalize"
+                            >
+                              {relation.relation}
+                            </TabsTrigger>
+                          );
+                        })}
+                      </TabsList>
+
+                      {relations.map((relation, index) => {
+                        const animeEntries = relation.entry.filter(
+                          (entry) => entry.type === "anime"
+                        );
+
+                        if (animeEntries.length === 0) return null;
+
+                        return (
+                          <TabsContent
+                            key={index}
+                            value={relation.relation}
+                            className="mt-6"
+                          >
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                              {animeEntries.map((entry) => {
+                                const animeData = relatedAnimeData.find(
+                                  (a) => a.mal_id === entry.mal_id
+                                );
+
+                                // If we have the full anime data, use AnimeCard
+                                if (animeData) {
+                                  return (
+                                    <AnimeCard
+                                      key={entry.mal_id}
+                                      anime={animeData}
+                                    />
+                                  );
+                                }
+
+                                // Fallback for when we don't have full anime data
+                                return (
+                                  <Link
+                                    key={entry.mal_id}
+                                    href={`/browse/anime/${entry.mal_id}`}
+                                    className="group block"
+                                  >
+                                    <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                                      <div className="relative aspect-3/4 w-full overflow-hidden bg-muted">
+                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                          No Image
+                                        </div>
+                                      </div>
+                                      <CardContent className="p-3">
+                                        <h5 className="text-sm font-medium line-clamp-2">
+                                          {entry.name}
+                                        </h5>
+                                      </CardContent>
+                                    </Card>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </TabsContent>
+                        );
+                      })}
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>
