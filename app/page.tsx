@@ -32,7 +32,7 @@ async function NewestAnimeSection() {
       title="Newest"
       description="Currently airing anime this season"
       animeList={data}
-      viewAllLink="/browse"
+      viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
     />
   );
 }
@@ -58,7 +58,7 @@ async function MostPopularSection() {
       title="Most Popular"
       description="Fan favorites and trending anime"
       animeList={data}
-      viewAllLink="/browse"
+      viewAllLink="/browse?order_by=popularity&sort=asc"
     />
   );
 }
@@ -84,7 +84,7 @@ async function LatestSeriesSection() {
       title="Latest Series"
       description="Recent TV anime releases"
       animeList={data}
-      viewAllLink="/browse"
+      viewAllLink="/browse?type=tv&order_by=start_date&sort=desc"
     />
   );
 }
@@ -110,7 +110,7 @@ async function LatestMoviesSection() {
       title="Latest Movies"
       description="Recent anime movie releases"
       animeList={data}
-      viewAllLink="/browse"
+      viewAllLink="/browse?type=movie&order_by=start_date&sort=desc"
     />
   );
 }
@@ -118,17 +118,17 @@ async function LatestMoviesSection() {
 export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
         {/* Hero Section */}
-        <header className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <header className="flex flex-col gap-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Anime Explorer
           </h1>
-          <p className="text-muted-foreground text-lg md:text-xl mb-6 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl">
             Discover and explore the world of anime. From the latest releases to
             timeless classics.
           </p>
-          <Link href="/browse">
+          <Link href="/browse" className="w-fit">
             <Button size="lg" className="text-lg px-8">
               Browse All Anime
               <Sparkles className="w-5 h-5 ml-2" />

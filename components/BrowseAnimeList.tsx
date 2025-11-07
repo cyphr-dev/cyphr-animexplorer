@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { AnimeCard } from "@/components/AnimeCard";
 import { AnimeListCard } from "@/components/AnimeListCard";
 import { fetchAnimeList } from "@/lib/api/jikan";
@@ -46,6 +47,10 @@ export default function BrowseAnimeList({
   initialPage,
   initialGenres,
 }: BrowseAnimeListProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [animeList, setAnimeList] = useState<Anime[]>(initialData);
   const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
@@ -53,21 +58,65 @@ export default function BrowseAnimeList({
   const [error, setError] = useState<string | null>(null);
 
   // View state
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">(
+    (searchParams.get("view") as "grid" | "list") || "grid"
+  );
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [selectedRating, setSelectedRating] = useState<string>("");
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-  const [minScore, setMinScore] = useState<string>("");
-  const [orderBy, setOrderBy] = useState<string>("popularity");
-  const [sortOrder, setSortOrder] = useState<string>("asc");
+  // Initialize filter states from URL params
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(
+    searchParams.get("q") || ""
+  );
+  const [selectedType, setSelectedType] = useState<string>(
+    searchParams.get("type") || ""
+  );
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    searchParams.get("status") || ""
+  );
+  const [selectedRating, setSelectedRating] = useState<string>(
+    searchParams.get("rating") || ""
+  );
+  const [selectedGenres, setSelectedGenres] = useState<number[]>(
+    searchParams.get("genres")
+      ? searchParams.get("genres")!.split(",").map(Number)
+      : []
+  );
+  const [minScore, setMinScore] = useState<string>(
+    searchParams.get("min_score") || ""
+  );
+  const [orderBy, setOrderBy] = useState<string>(
+    searchParams.get("order_by") || "popularity"
+  );
+  const [sortOrder, setSortOrder] = useState<string>(
+    searchParams.get("sort") || "asc"
+  );
 
   const observerTarget = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Function to update URL params
+  const updateURLParams = useCallback(
+    (params: Record<string, string | number | null | undefined>) => {
+      const newParams = new URLSearchParams(window.location.search);
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          newParams.set(key, String(value));
+        } else {
+          newParams.delete(key);
+        }
+      });
+
+      const newUrl = `${pathname}?${newParams.toString()}`;
+      const currentUrl = `${pathname}${window.location.search}`;
+
+      // Only update if URL actually changed
+      if (newUrl !== currentUrl) {
+        router.push(newUrl, { scroll: false });
+      }
+    },
+    [pathname, router]
+  );
 
   // Debounce search input
   useEffect(() => {
@@ -233,11 +282,18 @@ export default function BrowseAnimeList({
   }, [loadMore, hasMore, loading]);
 
   const handleGenreToggle = (genreId: number) => {
-    setSelectedGenres((prev) =>
-      prev.includes(genreId)
+    setSelectedGenres((prev) => {
+      const newGenres = prev.includes(genreId)
         ? prev.filter((id) => id !== genreId)
-        : [...prev, genreId]
-    );
+        : [...prev, genreId];
+
+      // Update URL with new genres
+      updateURLParams({
+        genres: newGenres.length > 0 ? newGenres.join(",") : null,
+      });
+
+      return newGenres;
+    });
   };
 
   const clearFilters = () => {
@@ -247,7 +303,36 @@ export default function BrowseAnimeList({
     setSelectedRating("");
     setSelectedGenres([]);
     setMinScore("");
+
+    // Clear all filter params from URL
+    router.push(pathname, { scroll: false });
   };
+
+  // Update URL when filters change
+  useEffect(() => {
+    updateURLParams({
+      q: debouncedSearch || null,
+      type: selectedType || null,
+      status: selectedStatus || null,
+      rating: selectedRating || null,
+      genres: selectedGenres.length > 0 ? selectedGenres.join(",") : null,
+      min_score: minScore || null,
+      order_by: orderBy !== "popularity" ? orderBy : null,
+      sort: sortOrder !== "asc" ? sortOrder : null,
+      view: viewMode !== "grid" ? viewMode : null,
+    });
+  }, [
+    debouncedSearch,
+    selectedType,
+    selectedStatus,
+    selectedRating,
+    selectedGenres,
+    minScore,
+    orderBy,
+    sortOrder,
+    viewMode,
+    updateURLParams,
+  ]);
 
   const hasActiveFilters =
     searchQuery ||
