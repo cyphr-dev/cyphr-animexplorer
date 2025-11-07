@@ -1,65 +1,160 @@
-import Image from "next/image";
+import { Suspense } from "react";
+import {
+  fetchTopAnime,
+  fetchCurrentlyAiring,
+  fetchAnimeByTypeAndStatus,
+} from "@/lib/api/jikan";
+import AnimeCategorySection from "@/components/AnimeCategorySection";
+import { CategorySectionSkeleton } from "@/components/CategorySectionSkeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export default function Home() {
+// Fetch newest anime (currently airing)
+async function NewestAnimeSection() {
+  let data;
+  try {
+    data = await fetchCurrentlyAiring();
+  } catch (error) {
+    console.error("Error loading newest anime:", error);
+    return (
+      <Alert variant="destructive" className="mb-12">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Failed to load newest anime.</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <AnimeCategorySection
+      title="Newest"
+      description="Currently airing anime this season"
+      animeList={data}
+      viewAllLink="/browse"
+    />
+  );
+}
+
+// Fetch most popular anime
+async function MostPopularSection() {
+  let data;
+  try {
+    data = await fetchTopAnime("bypopularity");
+  } catch (error) {
+    console.error("Error loading popular anime:", error);
+    return (
+      <Alert variant="destructive" className="mb-12">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Failed to load popular anime.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <AnimeCategorySection
+      title="Most Popular"
+      description="Fan favorites and trending anime"
+      animeList={data}
+      viewAllLink="/browse"
+    />
+  );
+}
+
+// Fetch latest TV series
+async function LatestSeriesSection() {
+  let data;
+  try {
+    data = await fetchAnimeByTypeAndStatus("tv");
+  } catch (error) {
+    console.error("Error loading latest series:", error);
+    return (
+      <Alert variant="destructive" className="mb-12">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Failed to load latest series.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <AnimeCategorySection
+      title="Latest Series"
+      description="Recent TV anime releases"
+      animeList={data}
+      viewAllLink="/browse"
+    />
+  );
+}
+
+// Fetch latest movies
+async function LatestMoviesSection() {
+  let data;
+  try {
+    data = await fetchAnimeByTypeAndStatus("movie");
+  } catch (error) {
+    console.error("Error loading latest movies:", error);
+    return (
+      <Alert variant="destructive" className="mb-12">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Failed to load latest movies.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <AnimeCategorySection
+      title="Latest Movies"
+      description="Recent anime movie releases"
+      animeList={data}
+      viewAllLink="/browse"
+    />
+  );
+}
+
+export default async function Home() {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <header className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Anime Explorer
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground text-lg md:text-xl mb-6 max-w-2xl mx-auto">
+            Discover and explore the world of anime. From the latest releases to
+            timeless classics.
           </p>
+          <Link href="/browse">
+            <Button size="lg" className="text-lg px-8">
+              Browse All Anime
+              <Sparkles className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+        </header>
+
+        {/* Category Sections */}
+        <div className="space-y-4">
+          <Suspense fallback={<CategorySectionSkeleton />}>
+            <NewestAnimeSection />
+          </Suspense>
+
+          <Suspense fallback={<CategorySectionSkeleton />}>
+            <MostPopularSection />
+          </Suspense>
+
+          <Suspense fallback={<CategorySectionSkeleton />}>
+            <LatestSeriesSection />
+          </Suspense>
+
+          <Suspense fallback={<CategorySectionSkeleton />}>
+            <LatestMoviesSection />
+          </Suspense>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
