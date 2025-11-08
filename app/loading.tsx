@@ -3,12 +3,11 @@ import AnimeHero from "@/components/AnimeHero";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-background -mt-17">
-      {/* Hero Section Skeleton */}
+    <div className="min-h-screen bg-background -mt-18">
+      {/* Hero Section */}
       <AnimeHero />
-
-      {/* Category Sections Skeleton */}
-      <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
+      <div className="container mx-auto px-4 pt-4 md:pt-8 flex flex-col gap-12">
+        {/* Category Sections */}
         <div className="space-y-4">
           <CategorySectionSkeleton />
           <CategorySectionSkeleton />
