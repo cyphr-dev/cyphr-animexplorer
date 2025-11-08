@@ -5,7 +5,7 @@ import { Heart, Star, TrendingUp, Users } from "lucide-react";
 export default function AnimeStatsGrid({ anime }: { anime: Anime }) {
   return (
     <Card>
-      <CardContent className="w-full grid grid-cols-1 gap-8">
+      <CardContent className="w-full grid grid-cols-4 md:grid-cols-1 gap-8">
         {/* Score */}
         <div className="flex flex-col col-span-1 items-center justify-center text-center">
           <Star className="w-6 h-6 fill-yellow-400 text-yellow-400 mb-2" />
