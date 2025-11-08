@@ -276,8 +276,8 @@ export default function BrowseAnimeList() {
     { value: "favorites", label: "Favorites" },
   ];
 
-  // Show loading state for initial load
-  if (isLoading && !animeList.length) {
+  // Show loading state only for the very first load (no filters applied)
+  if (isLoading && !animeList.length && !hasActiveFilters) {
     return (
       <div className="flex justify-center items-center py-8">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -300,7 +300,7 @@ export default function BrowseAnimeList() {
   return (
     <div className="space-y-6">
       {/* Mobile Search and Controls */}
-      <Card className="lg:hidden sticky top-22 bg-gray-100 dark:bg-gray-800 py-4 px-0 z-10">
+      <Card className="lg:hidden sticky top-20 sm:top-24 bg-gray-100 dark:bg-gray-800 py-4 px-0 z-40">
         <CardContent className="space-y-4">
           {/* Search Bar */}
           <div className="relative">
