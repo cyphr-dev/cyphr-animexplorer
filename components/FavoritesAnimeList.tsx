@@ -179,7 +179,9 @@ export default function FavoritesAnimeList() {
     favoriteAnimeList.forEach((anime) => {
       anime.genres.forEach((genre) => genreIds.add(genre.mal_id));
     });
-    return allGenres.filter((genre: { mal_id: number; name: string }) => genreIds.has(genre.mal_id));
+    return allGenres.filter((genre: { mal_id: number; name: string }) =>
+      genreIds.has(genre.mal_id)
+    );
   }, [favoriteAnimeList, allGenres, genresLoading]);
 
   // Get available types from favorites
@@ -224,10 +226,10 @@ export default function FavoritesAnimeList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-2">
+          <h2 className="font-bold flex items-center gap-2">
             <Heart className="w-8 h-8 fill-red-500 text-red-500" />
             My Favorites
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2">
             {filteredAnimeList.length}{" "}
             {favorites.length === 1 ? "anime" : "anime"}
@@ -329,7 +331,9 @@ export default function FavoritesAnimeList() {
                     selectedGenres={selectedGenres}
                     onGenreToggle={handleGenreToggle}
                     availableGenres={availableGenres}
-                    showGenreFilter={availableGenres.length > 0 || genresLoading}
+                    showGenreFilter={
+                      availableGenres.length > 0 || genresLoading
+                    }
                     genresLoading={genresLoading}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}

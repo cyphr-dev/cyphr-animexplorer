@@ -23,9 +23,6 @@ export default function FavoritesPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 pt-4 sm:pt-8">
-        <header className="mb-6">
-          <h2>My Favorites</h2>
-        </header>
         <FavoritesAnimeList />
       </div>
     </div>

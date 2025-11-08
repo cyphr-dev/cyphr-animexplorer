@@ -107,7 +107,7 @@ export default function AnimeFooter() {
             <div className="flex items-center gap-4">
               <span className="text-xs">
                 Made with{" "}
-                <Heart size={12} className="inline mx-1 text-red-500" /> by
+                <Heart size={12} className="inline mx-1 text-red-500" /> by {""}
                 <a
                   href="https://cyphr.my"
                   target="_blank"
