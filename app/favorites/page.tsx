@@ -46,7 +46,7 @@ async function FavoritesList() {
 export default async function FavoritesPage() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-4 sm:pt-8">
         <Suspense fallback={<AnimeListSkeleton />}>
           <FavoritesList />
         </Suspense>

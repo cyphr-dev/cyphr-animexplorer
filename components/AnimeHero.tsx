@@ -26,9 +26,7 @@ export default function AnimeHero() {
 
         <Link href="/browse" className="w-fit">
           <Button size="lg" className="px-8">
-            <p className="text-white text-sm md:text-lg max-w-lg">
-              Browse All Anime
-            </p>
+            <p className="text-white">Browse All Anime</p>
             <Sparkles className="w-5 h-5 ml-2" />
           </Button>
         </Link>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { AnimeProfileAvatar } from "./AnimeProfileAvatar";
 import { ModeToggle } from "./ui/theme-toggle";
 import { Button } from "./ui/button";
 import { Heart, Home, Grid3x3 } from "lucide-react";
@@ -14,7 +13,7 @@ export default function AnimeHeader() {
 
   return (
     <header className="w-full flex sm:px-4 justify-center sticky top-0 sm:top-3 z-50 container mx-auto">
-      <div className="flex justify-between w-full px-4 sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md">
+      <div className="flex justify-between w-full px-4 sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md border-1">
         <Link
           href="/"
           className="font-bold text-lg sm:text-xl hover:opacity-80 transition-opacity"
@@ -30,7 +29,7 @@ export default function AnimeHeader() {
               size="sm"
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
-              <Home className="w-4 h-4 sm:mr-2" />
+              <Home className="w-4 h-4" />
               <span className="hidden md:inline">Home</span>
             </Button>
           </Link>
@@ -41,7 +40,7 @@ export default function AnimeHeader() {
               size="sm"
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
-              <Grid3x3 className="w-4 h-4 sm:mr-2" />
+              <Grid3x3 className="w-4 h-4" />
               <span className="hidden md:inline">Browse</span>
             </Button>
           </Link>
@@ -53,7 +52,7 @@ export default function AnimeHeader() {
               className="h-9 w-9 sm:w-auto sm:px-4 relative rounded-full"
             >
               <Heart
-                className={`w-4 h-4 sm:mr-2 ${
+                className={`w-4 h-4 ${
                   pathname === "/favorites" ? "fill-current" : ""
                 }`}
               />

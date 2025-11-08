@@ -103,7 +103,7 @@ export interface CharacterImage {
 export interface Character {
   character: {
     mal_id: number;
-    url: string;
+    url?: string; // Made optional since it can be undefined
     images: CharacterImage;
     name: string;
   };
@@ -112,7 +112,7 @@ export interface Character {
   voice_actors: Array<{
     person: {
       mal_id: number;
-      url: string;
+      url?: string; // Made optional since it can be undefined
       images: {
         jpg: {
           image_url: string;
@@ -121,5 +121,50 @@ export interface Character {
       name: string;
     };
     language: string;
+  }>;
+}
+
+export interface AnimePicture {
+  jpg?: {
+    image_url?: string;
+    small_image_url?: string;
+    large_image_url?: string;
+  };
+  webp?: {
+    image_url?: string;
+    small_image_url?: string;
+    large_image_url?: string;
+  };
+}
+
+export interface AnimeVideo {
+  title: string;
+  url?: string; // Made optional since it can be undefined
+  images?: {
+    image_url?: string;
+    small_image_url?: string;
+    medium_image_url?: string;
+    large_image_url?: string;
+    maximum_image_url?: string;
+  };
+}
+
+export interface AnimeVideos {
+  promo: AnimeVideo[];
+  music_videos: AnimeVideo[];
+  episodes: AnimeVideo[];
+}
+
+export interface AnimeStatistics {
+  watching: number;
+  completed: number;
+  on_hold: number;
+  dropped: number;
+  plan_to_watch: number;
+  total: number;
+  scores: Array<{
+    score: number;
+    votes: number;
+    percentage: number;
   }>;
 }

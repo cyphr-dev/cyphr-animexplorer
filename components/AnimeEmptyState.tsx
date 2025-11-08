@@ -27,7 +27,7 @@ export default function AnimeEmptyState({
           </div>
           {/* Additional Information Alert */}
           {children}
-          <Link href="/">
+          <Link href="/browse">
             <Button size="lg">Browse All Anime</Button>
           </Link>
         </div>

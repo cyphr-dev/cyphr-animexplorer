@@ -3,27 +3,29 @@ import {
   fetchAnimeRelations,
   fetchAnimeByIds,
   fetchAnimeCharacters,
+  fetchAnimePictures,
+  fetchAnimeVideos,
+  fetchAnimeStatistics,
 } from "@/lib/api/jikan";
-import { Anime, AnimeRelation, Character } from "@/lib/types/anime";
-import type { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
 import {
-  Star,
-  Calendar,
-  Film,
-  Clock,
-  TrendingUp,
-  Heart,
-  Users,
-  PlayCircle,
-  AlertCircle,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+  Anime,
+  AnimeRelation,
+  Character,
+  AnimePicture,
+  AnimeVideos,
+  AnimeStatistics,
+} from "@/lib/types/anime";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AnimeCard } from "@/components/AnimeCard";
-import Link from "next/link";
+import { AnimeDetailsSidebar } from "@/components/AnimeDetailsSidebar";
+import { AnimeInfoTab } from "@/components/AnimeInfoTab";
+import { AnimeMediaTab } from "@/components/AnimeMediaTab";
+import { AnimeStatisticsTab } from "@/components/AnimeStatisticsTab";
+import { AnimeRelatedTab } from "@/components/AnimeRelatedTab";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
+import AnimeDetailsHeader from "@/components/AnimeDetailsHeader";
+import AnimeStatsGrid from "@/components/AnimeStatsGrid";
 
 interface AnimeDetailsPageProps {
   params: Promise<{
@@ -106,16 +108,22 @@ export default async function AnimeDetailsPage({
     notFound();
   }
 
+  let anime: Anime;
+  let relations: AnimeRelation[] | null = null;
+  let relatedAnimeData: Anime[] = [];
+  let characters: Character[] = [];
+  let pictures: AnimePicture[] = [];
+  let videos: AnimeVideos | null = null;
+  let statistics: AnimeStatistics | null = null;
+
   try {
-    const anime: Anime = await fetchAnimeById(animeId);
+    anime = await fetchAnimeById(animeId);
 
     if (!anime) {
       notFound();
     }
 
     // Fetch relations data
-    let relations: AnimeRelation[] | null = null;
-    let relatedAnimeData: Anime[] = [];
     try {
       relations = await fetchAnimeRelations(animeId);
 
@@ -140,461 +148,88 @@ export default async function AnimeDetailsPage({
     }
 
     // Fetch characters data
-    let characters: Character[] = [];
     try {
       characters = await fetchAnimeCharacters(animeId);
     } catch (error) {
       console.error("Error fetching characters:", error);
     }
 
-    return (
-      <div className="container mx-auto bg-background">
-        <div className="mx-auto px-4 pt-8 space-y-6">
-          {/* Hero Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
-            {/* Poster */}
-            <div className="lg:col-span-2">
-              <div className="flex flex-col">
-                {/* Title Section */}
-                <div className="flex flex-col gap-2 sticky top-0 z-10 bg-background pb-2">
-                  <h3>{anime.title}</h3>
-                  {anime.title_japanese && (
-                    <p className="text-muted-foreground">
-                      {anime.title_japanese}
-                    </p>
-                  )}
-                  {anime.title_english &&
-                    anime.title_english !== anime.title && (
-                      <p className="text-muted-foreground mb-2">
-                        {anime.title_english}
-                      </p>
-                    )}
-                </div>
-                <div className="flex flex-col gap-6">
-                  <Card className="overflow-hidden p-0">
-                    <div className="relative aspect-3/4 w-full">
-                      <Image
-                        src={
-                          anime.images.webp.large_image_url ||
-                          anime.images.jpg.large_image_url
-                        }
-                        alt={anime.title}
-                        fill
-                        className="object-cover"
-                        priority
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                      />
-                    </div>
-                  </Card>
-                  {/* Genres Section */}
-                  {anime.genres && anime.genres.length > 0 && (
-                    <div>
-                      <div className="flex flex-wrap gap-2">
-                        {anime.genres.map((genre) => (
-                          <p
-                            key={genre.mal_id}
-                            className="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium hover:bg-primary/20 transition-colors"
-                          >
-                            {genre.name}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {/* Quick Info */}
-                  <div className="flex flex-col gap-4">
-                    {anime.type && (
-                      <div className="flex items-start gap-3">
-                        <Film className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-muted-foreground">Type</p>
-                          <p className="font-medium">{anime.type}</p>
-                        </div>
-                      </div>
-                    )}
+    // Fetch additional media content
+    try {
+      pictures = await fetchAnimePictures(animeId);
+    } catch (error) {
+      console.error("Error fetching pictures:", error);
+    }
 
-                    {anime.episodes && (
-                      <div className="flex items-start gap-3">
-                        <PlayCircle className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Episodes
-                          </p>
-                          <p className="font-medium">
-                            {anime.episodes}{" "}
-                            {anime.episodes === 1 ? "Episode" : "Episodes"}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+    try {
+      videos = await fetchAnimeVideos(animeId);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+    }
 
-                    {anime.status && (
-                      <div className="flex items-start gap-3">
-                        <Calendar className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-muted-foreground">Status</p>
-                          <p className="font-medium">{anime.status}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {anime.duration && (
-                      <div className="flex items-start gap-3">
-                        <Clock className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-muted-foreground">Duration</p>
-                          <p className="font-medium">{anime.duration}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {anime.aired?.string && (
-                      <div className="flex items-start gap-3 sm:col-span-2">
-                        <Calendar className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-muted-foreground">Aired</p>
-                          <p className="font-medium">{anime.aired.string}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {anime.rating && (
-                      <div className="flex items-start gap-3 sm:col-span-2">
-                        <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <p className="text-muted-foreground">Rating</p>
-                          <p className="font-medium">{anime.rating}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Info */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
-              {/* Rating and Stats Grid */}
-              <div className="grid grid-cols-4 gap-4">
-                {/* Score */}
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center text-center">
-                    <Star className="w-8 h-8 fill-yellow-400 text-yellow-400 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {anime.score ? anime.score.toFixed(1) : "N/A"}
-                    </div>
-                    <p className="text-muted-foreground">Score</p>
-                    {anime.scored_by && (
-                      <p className="text-muted-foreground mt-1">
-                        {anime.scored_by.toLocaleString()} users
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Rank */}
-                {anime.rank && (
-                  <Card>
-                    <CardContent className="flex flex-col items-center justify-center text-center">
-                      <TrendingUp className="w-8 h-8 text-primary mb-2" />
-                      <div className="text-2xl font-bold">#{anime.rank}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Ranked
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Popularity */}
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center text-center">
-                    <Users className="w-8 h-8 text-primary mb-2" />
-                    <div className="text-2xl font-bold">
-                      #{anime.popularity}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Popularity
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Favorites */}
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center text-center">
-                    <Heart className="w-8 h-8 text-red-500 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {anime.favorites.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Favorites
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Trailer Section */}
-              {anime.trailer?.embed_url && (
-                <div className="relative aspect-video w-full rounded-lg">
-                  <iframe
-                    src={anime.trailer.embed_url}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={`${anime.title} Trailer`}
-                  />
-                </div>
-              )}
-
-              {/* Synopsis Section */}
-              {anime.synopsis && (
-                <div>
-                  <h3>Synopsis</h3>
-                  <p className="text-muted-foreground">{anime.synopsis}</p>
-                </div>
-              )}
-
-              {/* Background Section */}
-              {anime.background && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <h3>Background</h3>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <p className="text-muted-foreground leading-relaxed">
-                      {anime.background}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Additional Info Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <h3>Additional Information</h3>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {anime.source && (
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          Source
-                        </div>
-                        <div className="font-medium">{anime.source}</div>
-                      </div>
-                    )}
-                    {anime.season && anime.year && (
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          Season
-                        </div>
-                        <div className="font-medium capitalize">
-                          {anime.season} {anime.year}
-                        </div>
-                      </div>
-                    )}
-                    {anime.members && (
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          Members
-                        </div>
-                        <div className="font-medium">
-                          {anime.members.toLocaleString()}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Characters Section */}
-              {characters && characters.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <h3>Characters & Voice Actors</h3>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {characters.slice(0, 12).map((char) => (
-                        <div
-                          key={char.character.mal_id}
-                          className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          {/* Character Info */}
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
-                              <Image
-                                src={
-                                  char.character.images.webp.image_url ||
-                                  char.character.images.jpg.image_url
-                                }
-                                alt={char.character.name}
-                                fill
-                                className="object-cover"
-                                sizes="64px"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <Link
-                                href={char.character.url}
-                                target="_blank"
-                                className="font-medium hover:text-primary transition-colors line-clamp-1"
-                              >
-                                {char.character.name}
-                              </Link>
-                              <p className="text-sm text-muted-foreground">
-                                {char.role}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Voice Actor Info */}
-                          {char.voice_actors &&
-                            char.voice_actors.length > 0 && (
-                              <div className="flex items-center gap-3 flex-1 justify-end">
-                                <div className="text-right min-w-0">
-                                  <Link
-                                    href={char.voice_actors[0].person.url}
-                                    target="_blank"
-                                    className="font-medium hover:text-primary transition-colors line-clamp-1 block"
-                                  >
-                                    {char.voice_actors[0].person.name}
-                                  </Link>
-                                  <p className="text-sm text-muted-foreground">
-                                    {char.voice_actors[0].language}
-                                  </p>
-                                </div>
-                                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
-                                  <Image
-                                    src={
-                                      char.voice_actors[0].person.images.jpg
-                                        .image_url
-                                    }
-                                    alt={char.voice_actors[0].person.name}
-                                    fill
-                                    className="object-cover"
-                                    sizes="64px"
-                                  />
-                                </div>
-                              </div>
-                            )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-              {/* Relations Section - Seasons, Sequels, Prequels, etc. */}
-              {relations &&
-                relations.length > 0 &&
-                relations.some((rel) =>
-                  rel.entry.some((entry) => entry.type === "anime")
-                ) && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        <h3>Related Anime</h3>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Tabs
-                        defaultValue={
-                          relations.find((rel) =>
-                            rel.entry.some((entry) => entry.type === "anime")
-                          )?.relation
-                        }
-                        className="w-full"
-                      >
-                        <TabsList className="w-full justify-start flex-wrap h-auto">
-                          {relations.map((relation, index) => {
-                            const animeEntries = relation.entry.filter(
-                              (entry) => entry.type === "anime"
-                            );
-                            if (animeEntries.length === 0) return null;
-
-                            return (
-                              <TabsTrigger
-                                key={index}
-                                value={relation.relation}
-                                className="capitalize"
-                              >
-                                {relation.relation}
-                              </TabsTrigger>
-                            );
-                          })}
-                        </TabsList>
-
-                        {relations.map((relation, index) => {
-                          const animeEntries = relation.entry.filter(
-                            (entry) => entry.type === "anime"
-                          );
-
-                          if (animeEntries.length === 0) return null;
-
-                          return (
-                            <TabsContent
-                              key={index}
-                              value={relation.relation}
-                              className="mt-6"
-                            >
-                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {animeEntries.map((entry) => {
-                                  const animeData = relatedAnimeData.find(
-                                    (a) => a.mal_id === entry.mal_id
-                                  );
-
-                                  // If we have the full anime data, use AnimeCard
-                                  if (animeData) {
-                                    return (
-                                      <AnimeCard
-                                        key={entry.mal_id}
-                                        anime={animeData}
-                                      />
-                                    );
-                                  }
-
-                                  // Fallback for when we don't have full anime data
-                                  return (
-                                    <Link
-                                      key={entry.mal_id}
-                                      href={`/browse/anime/${entry.mal_id}`}
-                                      className="group block"
-                                    >
-                                      <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer">
-                                        <div className="relative aspect-3/4 w-full overflow-hidden bg-muted">
-                                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                            No Image
-                                          </div>
-                                        </div>
-                                        <CardContent className="p-3">
-                                          <h5 className="text-sm font-medium line-clamp-2">
-                                            {entry.name}
-                                          </h5>
-                                        </CardContent>
-                                      </Card>
-                                    </Link>
-                                  );
-                                })}
-                              </div>
-                            </TabsContent>
-                          );
-                        })}
-                      </Tabs>
-                    </CardContent>
-                  </Card>
-                )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    try {
+      statistics = await fetchAnimeStatistics(animeId);
+    } catch (error) {
+      console.error("Error fetching statistics:", error);
+    }
   } catch (error) {
     console.error("Error fetching anime details:", error);
     return <AnimeEmptyState />;
   }
+
+  return (
+    <div className="container mx-auto bg-background">
+      <div className="mx-auto px-4 pt-4 md:pt-8 space-y-6 grid grid-cols-1 md:grid-cols-11 gap-8">
+        {/* Hero Section */}
+        <div className="md:col-span-2">
+          <AnimeDetailsSidebar anime={anime} />
+        </div>
+        <div className="md:col-span-7 flex flex-col gap-6">
+          <AnimeDetailsHeader anime={anime} />
+
+          {/* Main Content Tabs */}
+          <Tabs defaultValue="info" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="info">Info</TabsTrigger>
+              <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="statistics">Statistics</TabsTrigger>
+              <TabsTrigger value="related">Related</TabsTrigger>
+            </TabsList>
+
+            {/* Info Tab */}
+            <TabsContent value="info" className="mt-6">
+              <AnimeInfoTab anime={anime} characters={characters} />
+            </TabsContent>
+
+            {/* Media Tab */}
+            <TabsContent value="media" className="mt-6">
+              <AnimeMediaTab
+                pictures={pictures}
+                videos={videos}
+                animeTitle={anime.title}
+              />
+            </TabsContent>
+
+            {/* Statistics Tab */}
+            <TabsContent value="statistics" className="mt-6">
+              <AnimeStatisticsTab statistics={statistics} />
+            </TabsContent>
+
+            {/* Related Tab */}
+            <TabsContent value="related" className="mt-6">
+              <AnimeRelatedTab
+                relations={relations}
+                relatedAnimeData={relatedAnimeData}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+        <div className="md:col-span-2">
+          <div className="sticky top-26">
+            <AnimeStatsGrid anime={anime} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

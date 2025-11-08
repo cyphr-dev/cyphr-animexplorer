@@ -29,7 +29,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "./ui/card";
 
 interface AnimeSearchBarProps {
   // Search and filters
@@ -87,6 +86,9 @@ interface AnimeSearchBarProps {
   // Clear filters
   onClearFilters: () => void;
   hasActiveFilters: boolean;
+
+  // Layout
+  isInSheet?: boolean;
 }
 
 export default function AnimeSearchBar({
@@ -133,6 +135,7 @@ export default function AnimeSearchBar({
   showSfwToggle = false,
   onClearFilters,
   hasActiveFilters,
+  isInSheet = false,
 }: AnimeSearchBarProps) {
   const [genreSearchQuery, setGenreSearchQuery] = useState("");
 
@@ -141,48 +144,61 @@ export default function AnimeSearchBar({
   );
 
   return (
-    <Card className="space-y-4 sticky top-25 bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-2xl items-center text-center z-50 backdrop-blur-md">
-      <CardContent className="flex flex-col gap-3 w-full">
-        {/* Search Bar Row */}
-        <div className="flex flex-col sm:flex-row gap-3 col-span-5">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                onSearchChange(e.target.value)
-              }
-              className="pl-9"
-            />
-          </div>
-        </div>
+    <div
+      className={`space-y-4 ${
+        isInSheet
+          ? ""
+          : "sticky top-25 sm:rounded-2xl items-center text-center z-10 backdrop-blur-md"
+      }`}
+    >
+      <div className="flex flex-col gap-3 w-full">
+        {/* Search Bar Row - Hidden in sheet since it's available outside */}
+        {!isInSheet && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-3 col-span-5">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onSearchChange(e.target.value)
+                  }
+                  className="pl-9"
+                />
+              </div>
+            </div>
 
-        <hr />
+            <hr />
 
-        {/* View Toggle */}
-        <div className="inline-flex rounded-full shadow-sm w-full" role="group">
-          <Button
-            type="button"
-            variant={viewMode === "grid" ? "default" : "outline"}
-            size="sm"
-            onClick={() => onViewModeChange("grid")}
-            className="rounded-r-none w-1/2"
-          >
-            <Grid3x3 className="w-4 h-4 mr-2" />
-            <p>Grid</p>
-          </Button>
-          <Button
-            type="button"
-            variant={viewMode === "list" ? "default" : "outline"}
-            size="sm"
-            onClick={() => onViewModeChange("list")}
-            className="rounded-l-none w-1/2"
-          >
-            <List className="w-4 h-4 mr-2" />
-            <p>List</p>
-          </Button>
-        </div>
+            {/* View Toggle - Hidden in sheet since it's available outside */}
+            <div
+              className="inline-flex rounded-full shadow-sm w-full"
+              role="group"
+            >
+              <Button
+                type="button"
+                variant={viewMode === "grid" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onViewModeChange("grid")}
+                className="rounded-r-none w-1/2"
+              >
+                <Grid3x3 className="w-4 h-4 md:mr-0 mr-2" />
+                <p>Grid</p>
+              </Button>
+              <Button
+                type="button"
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onViewModeChange("list")}
+                className="rounded-l-none w-1/2"
+              >
+                <List className="w-4 h-4 md:mr-0 mr-2" />
+                <p>List</p>
+              </Button>
+            </div>
+          </>
+        )}
         {/* Infinite Scroll Toggle (Browse only) */}
         {showInfiniteScrollToggle && (
           <Button
@@ -388,7 +404,7 @@ export default function AnimeSearchBar({
             <p>Clear Filters</p>
           </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

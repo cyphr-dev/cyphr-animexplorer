@@ -10,7 +10,24 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { Button } from "@/components/ui/button";
 import AnimeSearchBar from "@/components/AnimeSearchBar";
-import { AlertCircle, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  Loader2,
+  Filter,
+  Search,
+  Grid3x3,
+  List,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Card, CardContent } from "./ui/card";
 
 interface BrowseAnimeListProps {
   initialData: Anime[];
@@ -345,123 +362,229 @@ export default function BrowseAnimeList({
   ];
 
   return (
-    <div className="grid md:grid-cols-10 gap-6">
-      {/* Search and Filters */}
-      <div className="col-span-2">
-        <AnimeSearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search anime..."
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-          showTypeFilter={true}
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          showStatusFilter={true}
-          selectedRating={selectedRating}
-          onRatingChange={setSelectedRating}
-          showRatingFilter={true}
-          minScore={minScore}
-          onMinScoreChange={setMinScore}
-          showMinScoreFilter={true}
-          orderBy={orderBy}
-          onOrderByChange={setOrderBy}
-          sortOrder={sortOrder}
-          onSortOrderChange={setSortOrder}
-          sortOptions={browseSortOptions}
-          selectedGenres={selectedGenres}
-          onGenreToggle={handleGenreToggle}
-          availableGenres={initialGenres}
-          showGenreFilter={true}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          infiniteScrollEnabled={infiniteScrollEnabled}
-          onInfiniteScrollToggle={() =>
-            setInfiniteScrollEnabled(!infiniteScrollEnabled)
-          }
-          showInfiniteScrollToggle={true}
-          sfwMode={sfwMode}
-          onSfwToggle={() => setSfwMode(!sfwMode)}
-          showSfwToggle={true}
-          onClearFilters={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      </div>
+    <div className="space-y-6">
+      {/* Mobile Search and Controls */}
+      <Card className="lg:hidden sticky top-22 bg-gray-100 dark:bg-gray-800 py-4 px-0 z-10">
+        <CardContent className="space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search anime..."
+              value={searchQuery}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchQuery(e.target.value)
+              }
+              className="pl-9"
+            />
+          </div>
 
-      <div className="col-span-8">
-        {/* Results */}
-        {animeList.length === 0 && !loading && (
-          <AnimeEmptyState
-            title="No Anime Found"
-            description={
-              hasActiveFilters
-                ? "Try adjusting your filters to see more results."
-                : "No anime available at the moment."
+          {/* Controls Row */}
+          <div className="flex gap-2">
+            {/* View Toggle */}
+            <div
+              className="inline-flex rounded-full shadow-sm flex-1"
+              role="group"
+            >
+              <Button
+                type="button"
+                variant={viewMode === "grid" ? "default" : "outline"}
+                onClick={() => setViewMode("grid")}
+                className="rounded-r-none w-1/2"
+              >
+                <Grid3x3 className="w-4 h-4 mr-2" />
+                <span>Grid</span>
+              </Button>
+              <Button
+                type="button"
+                variant={viewMode === "list" ? "default" : "outline"}
+                onClick={() => setViewMode("list")}
+                className="rounded-l-none w-1/2"
+              >
+                <List className="w-4 h-4 mr-2" />
+                <span>List</span>
+              </Button>
+            </div>
+
+            {/* Filters Sheet Button */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="px-3">
+                  <Filter className="w-4 h-4" />
+                  {hasActiveFilters && (
+                    <span className="ml-1 bg-primary text-primary-foreground rounded-full w-2 h-2"></span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                <SheetHeader></SheetHeader>
+                <div className="mt-6 overflow-y-scroll">
+                  <AnimeSearchBar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    searchPlaceholder="Search anime..."
+                    selectedType={selectedType}
+                    onTypeChange={setSelectedType}
+                    showTypeFilter={true}
+                    selectedStatus={selectedStatus}
+                    onStatusChange={setSelectedStatus}
+                    showStatusFilter={true}
+                    selectedRating={selectedRating}
+                    onRatingChange={setSelectedRating}
+                    showRatingFilter={true}
+                    minScore={minScore}
+                    onMinScoreChange={setMinScore}
+                    showMinScoreFilter={true}
+                    orderBy={orderBy}
+                    onOrderByChange={setOrderBy}
+                    sortOrder={sortOrder}
+                    onSortOrderChange={setSortOrder}
+                    sortOptions={browseSortOptions}
+                    selectedGenres={selectedGenres}
+                    onGenreToggle={handleGenreToggle}
+                    availableGenres={initialGenres}
+                    showGenreFilter={true}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    infiniteScrollEnabled={infiniteScrollEnabled}
+                    onInfiniteScrollToggle={() =>
+                      setInfiniteScrollEnabled(!infiniteScrollEnabled)
+                    }
+                    showInfiniteScrollToggle={true}
+                    sfwMode={sfwMode}
+                    onSfwToggle={() => setSfwMode(!sfwMode)}
+                    showSfwToggle={true}
+                    onClearFilters={clearFilters}
+                    hasActiveFilters={hasActiveFilters}
+                    isInSheet={true}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid col-span-1 md:grid-cols-10 gap-6">
+        {/* Desktop Search and Filters */}
+        <div className="hidden lg:block col-span-2">
+          <AnimeSearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search anime..."
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            showTypeFilter={true}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            showStatusFilter={true}
+            selectedRating={selectedRating}
+            onRatingChange={setSelectedRating}
+            showRatingFilter={true}
+            minScore={minScore}
+            onMinScoreChange={setMinScore}
+            showMinScoreFilter={true}
+            orderBy={orderBy}
+            onOrderByChange={setOrderBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            sortOptions={browseSortOptions}
+            selectedGenres={selectedGenres}
+            onGenreToggle={handleGenreToggle}
+            availableGenres={initialGenres}
+            showGenreFilter={true}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            infiniteScrollEnabled={infiniteScrollEnabled}
+            onInfiniteScrollToggle={() =>
+              setInfiniteScrollEnabled(!infiniteScrollEnabled)
             }
-          >
-            {hasActiveFilters && (
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
-            )}
-          </AnimeEmptyState>
-        )}
+            showInfiniteScrollToggle={true}
+            sfwMode={sfwMode}
+            onSfwToggle={() => setSfwMode(!sfwMode)}
+            showSfwToggle={true}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
 
-        {viewMode === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {animeList.map((anime) => (
-              <AnimeCard key={anime.mal_id} anime={anime} />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {animeList.map((anime) => (
-              <AnimeListCard key={anime.mal_id} anime={anime} />
-            ))}
-          </div>
-        )}
+        <div className="col-span-1 md:col-span-10 lg:col-span-8">
+          {/* Results */}
+          {animeList.length === 0 && !loading && (
+            <AnimeEmptyState
+              title="No Anime Found"
+              description={
+                hasActiveFilters
+                  ? "Try adjusting your filters to see more results."
+                  : "No anime available at the moment."
+              }
+            >
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              )}
+            </AnimeEmptyState>
+          )}
 
-        {/* Loading indicator */}
-        {loading && (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <span className="ml-2 text-muted-foreground">
-              Loading more anime...
-            </span>
-          </div>
-        )}
-
-        {/* Load More Button (when infinite scroll is disabled) */}
-        {!infiniteScrollEnabled &&
-          hasMore &&
-          !loading &&
-          animeList.length > 0 && (
-            <div className="flex justify-center py-8">
-              <Button onClick={loadMore} size="lg">
-                Load More
-              </Button>
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {animeList.map((anime) => (
+                <AnimeCard key={anime.mal_id} anime={anime} />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {animeList.map((anime) => (
+                <AnimeListCard key={anime.mal_id} anime={anime} />
+              ))}
             </div>
           )}
 
-        {/* Error message */}
-        {error && (
-          <Alert variant="destructive" className="mt-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+          {/* Loading indicator */}
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">
+                Loading more anime...
+              </span>
+            </div>
+          )}
 
-        {/* End of content message */}
-        {!hasMore && !loading && animeList.length > 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>You&apos;ve reached the end! 🎉</p>
-            <p className="text-sm mt-2">Loaded {animeList.length} anime</p>
-          </div>
-        )}
+          {/* Load More Button (when infinite scroll is disabled) */}
+          {!infiniteScrollEnabled &&
+            hasMore &&
+            !loading &&
+            animeList.length > 0 && (
+              <div className="flex justify-center py-8">
+                <Button onClick={loadMore} size="lg">
+                  Load More
+                </Button>
+              </div>
+            )}
 
-        {/* Intersection observer target (only when infinite scroll is enabled) */}
-        {infiniteScrollEnabled && <div ref={observerTarget} className="h-4" />}
+          {/* Error message */}
+          {error && (
+            <Alert variant="destructive" className="mt-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* End of content message */}
+          {!hasMore && !loading && animeList.length > 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>You&apos;ve reached the end! 🎉</p>
+              <p className="text-sm mt-2">Loaded {animeList.length} anime</p>
+            </div>
+          )}
+
+          {/* Intersection observer target (only when infinite scroll is enabled) */}
+          {infiniteScrollEnabled && (
+            <div ref={observerTarget} className="h-4" />
+          )}
+        </div>
       </div>
     </div>
   );

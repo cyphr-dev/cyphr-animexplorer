@@ -1,6 +1,42 @@
 import { JikanResponse } from "@/lib/types/anime";
+import { jikanRateLimiter } from "./rateLimiter";
 
 const JIKAN_API_BASE_URL = "https://api.jikan.moe/v4";
+
+// Helper function to handle rate limit errors and retries
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  retries: number = 3
+): Promise<Response> {
+  return jikanRateLimiter.execute(async () => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options);
+
+        if (response.status === 429) {
+          // Rate limited, wait longer before retry
+          const waitTime = Math.pow(2, i) * 1000; // Exponential backoff
+          console.log(
+            `🚦 Jikan API rate limit hit. Waiting ${waitTime}ms before retry ${
+              i + 1
+            }/${retries}...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        return response;
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        // Wait before retry
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+
+    throw new Error(`Failed to fetch after ${retries} retries`);
+  });
+}
 
 export interface FetchAnimeParams {
   page?: number;
@@ -82,7 +118,7 @@ export async function fetchAnimeById(id: number) {
   try {
     const url = `${JIKAN_API_BASE_URL}/anime/${id}`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       next: { revalidate: 3600 },
     });
 
@@ -204,7 +240,7 @@ export async function fetchAnimeRelations(id: number) {
   try {
     const url = `${JIKAN_API_BASE_URL}/anime/${id}/relations`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       next: { revalidate: 3600 },
     });
 
@@ -218,7 +254,7 @@ export async function fetchAnimeRelations(id: number) {
     return data.data;
   } catch (error) {
     console.error("Error fetching anime relations:", error);
-    throw error;
+    return []; // Return empty array instead of throwing to prevent page crash
   }
 }
 
@@ -227,7 +263,7 @@ export async function fetchAnimeCharacters(id: number) {
   try {
     const url = `${JIKAN_API_BASE_URL}/anime/${id}/characters`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       next: { revalidate: 3600 },
     });
 
@@ -241,7 +277,7 @@ export async function fetchAnimeCharacters(id: number) {
     return data.data;
   } catch (error) {
     console.error("Error fetching anime characters:", error);
-    throw error;
+    return []; // Return empty array instead of throwing to prevent page crash
   }
 }
 
@@ -276,5 +312,70 @@ export async function fetchAnimeByIds(ids: number[]) {
   } catch (error) {
     console.error("Error fetching anime by IDs:", error);
     return [];
+  }
+}
+
+// Fetch anime pictures (promotional images, screenshots)
+export async function fetchAnimePictures(id: number) {
+  try {
+    const url = `${JIKAN_API_BASE_URL}/anime/${id}/pictures`;
+
+    const response = await fetchWithRetry(url, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch anime pictures: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching anime pictures:", error);
+    return [];
+  }
+}
+
+// Fetch anime videos (promotional videos, music videos, episodes previews)
+export async function fetchAnimeVideos(id: number) {
+  try {
+    const url = `${JIKAN_API_BASE_URL}/anime/${id}/videos`;
+
+    const response = await fetchWithRetry(url, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch anime videos: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching anime videos:", error);
+    return null;
+  }
+}
+
+// Fetch anime statistics
+export async function fetchAnimeStatistics(id: number) {
+  try {
+    const url = `${JIKAN_API_BASE_URL}/anime/${id}/statistics`;
+
+    const response = await fetchWithRetry(url, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch anime statistics: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching anime statistics:", error);
+    return null;
   }
 }

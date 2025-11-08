@@ -56,7 +56,7 @@ export default async function Home() {
     <div className="min-h-screen bg-background -mt-17">
       {/* Hero Section */}
       <AnimeHero />
-      <div className="container mx-auto px-4 py-8 flex flex-col gap-12">
+      <div className="container mx-auto px-4 pt-4 md:pt-8 flex flex-col gap-12">
         {/* Category Sections */}
         {newestError && popularError && seriesError && moviesError ? (
           <AnimeEmptyState

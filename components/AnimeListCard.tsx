@@ -29,11 +29,11 @@ export function AnimeListCard({ anime }: AnimeListCardProps) {
 
   return (
     <Link href={`/browse/anime/${anime.mal_id}`}>
-      <Card className="overflow-hidden transition-all hover:shadow-lg cursor-pointer mb-4">
-        <CardContent className="p-0">
-          <div className="flex flex-col sm:flex-row gap-4">
+      <Card className="overflow-hidden transition-all hover:shadow-lg cursor-pointer mb-4 p-0">
+        <CardContent className="px-0">
+          <div className="flex flex-row gap-4">
             {/* Image */}
-            <div className="relative w-full sm:w-32 aspect-3/4 sm:aspect-auto sm:h-44 shrink-0 overflow-hidden rounded-md bg-muted">
+            <div className="relative w-32 overflow-hidden bg-muted">
               <Image
                 src={
                   anime.images.webp.large_image_url ||
@@ -47,7 +47,7 @@ export function AnimeListCard({ anime }: AnimeListCardProps) {
             </div>
 
             {/* Content */}
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2 py-4 pr-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg line-clamp-2 mb-1">
