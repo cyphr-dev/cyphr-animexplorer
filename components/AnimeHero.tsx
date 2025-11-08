@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function AnimeHero() {
   return (
     <header className="flex flex-col h-[400px] md:h-[500px] align-middle justify-center bg-[#621371] overflow-clip relative">
-      <div className="p-4 container mx-auto flex flex-col gap-12 z-20 relative">
+      <div className="p-4 container mx-auto flex flex-col gap-8 z-20 relative">
         <div className="flex flex-col gap-2">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent ">
             AnimeXplorer
