@@ -25,7 +25,6 @@ export function FavoriteButton({ anime }: FavoriteButtonProps) {
     <Button
       onClick={handleToggleFavorite}
       variant={isInFavorites ? "default" : "outline"}
-      size="lg"
       className="w-full"
     >
       <Heart

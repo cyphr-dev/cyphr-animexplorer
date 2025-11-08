@@ -22,16 +22,16 @@ export function AnimeDetailsSidebar({ anime }: AnimeDetailsHeaderProps) {
             <p className="text-muted-foreground mb-2">{anime.title_english}</p>
           )}
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {/* Clickable Poster */}
           <ClickablePoster anime={anime} />
-
+          <hr />
           {/* Favorite Button */}
           <FavoriteButton anime={anime} />
-
+          <hr />
           {/* Genres Section */}
           {anime.genres && anime.genres.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-1">
               {anime.genres.map((genre) => (
                 <Link
                   key={genre.mal_id}
@@ -43,6 +43,7 @@ export function AnimeDetailsSidebar({ anime }: AnimeDetailsHeaderProps) {
               ))}
             </div>
           )}
+          <hr />
           {/* Quick Info */}
           <div className="flex flex-col gap-4">
             {anime.type && (
