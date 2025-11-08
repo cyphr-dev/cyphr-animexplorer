@@ -197,12 +197,12 @@ export default async function AnimeDetailsPage({
             </TabsList>
 
             {/* Info Tab */}
-            <TabsContent value="info" className="mt-6">
+            <TabsContent value="info">
               <AnimeInfoTab anime={anime} characters={characters} />
             </TabsContent>
 
             {/* Media Tab */}
-            <TabsContent value="media" className="mt-6">
+            <TabsContent value="media">
               <AnimeMediaTab
                 pictures={pictures}
                 videos={videos}
@@ -211,12 +211,12 @@ export default async function AnimeDetailsPage({
             </TabsContent>
 
             {/* Statistics Tab */}
-            <TabsContent value="statistics" className="mt-6">
+            <TabsContent value="statistics">
               <AnimeStatisticsTab statistics={statistics} />
             </TabsContent>
 
             {/* Related Tab */}
-            <TabsContent value="related" className="mt-6">
+            <TabsContent value="related">
               <AnimeRelatedTab
                 relations={relations}
                 relatedAnimeData={relatedAnimeData}

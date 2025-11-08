@@ -1,5 +1,4 @@
 import { BarChart3 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimeStatistics } from "@/lib/types/anime";
 
 interface AnimeStatisticsTabProps {
@@ -9,65 +8,55 @@ interface AnimeStatisticsTabProps {
 export function AnimeStatisticsTab({ statistics }: AnimeStatisticsTabProps) {
   if (!statistics) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <BarChart3 className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">
-            No Statistics Available
-          </h3>
-          <p className="text-muted-foreground text-center">
-            Statistics data is not available for this anime.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-12">
+        <BarChart3 className="w-16 h-16 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No Statistics Available</h3>
+        <p className="text-muted-foreground text-center">
+          Statistics data is not available for this anime.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5" />
-          <h3>Statistics</h3>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-6">
+      {/* Statistics Section */}
+      <div className="flex flex-col gap-6">
+        <h3 className="flex items-center gap-2">Statistics</h3>
         <div className="space-y-6">
           {/* Watching Status Stats */}
           <div>
             <h4 className="text-lg font-semibold mb-4">Viewing Status</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-green-500">
+                <h4 className="text-green-500">
                   {statistics.watching.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">Watching</div>
+                </h4>
+                <p className="text-muted-foreground">Watching</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-blue-500">
+                <h4 className="text-blue-500">
                   {statistics.completed.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">Completed</div>
+                </h4>
+                <p className="text-muted-foreground">Completed</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-yellow-500">
+                <h4 className="text-yellow-500">
                   {statistics.on_hold.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">On Hold</div>
+                </h4>
+                <p className="text-muted-foreground">On Hold</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-red-500">
+                <h4 className="text-red-500">
                   {statistics.dropped.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">Dropped</div>
+                </h4>
+                <p className="text-muted-foreground">Dropped</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-purple-500">
+                <h4 className="text-purple-500">
                   {statistics.plan_to_watch.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Plan to Watch
-                </div>
+                </h4>
+                <p className="text-muted-foreground">Plan to Watch</p>
               </div>
             </div>
           </div>
@@ -87,7 +76,7 @@ export function AnimeStatisticsTab({ statistics }: AnimeStatisticsTabProps) {
                       </div>
                       <div className="flex-1 bg-muted rounded-full h-6 relative overflow-hidden">
                         <div
-                          className="h-full bg-linear-to-r from-red-500 via-yellow-500 to-green-500 transition-all"
+                          className="h-full bg-primary transition-all"
                           style={{
                             width: `${Math.max(score.percentage, 2)}%`,
                           }}
@@ -96,16 +85,16 @@ export function AnimeStatisticsTab({ statistics }: AnimeStatisticsTabProps) {
                           {score.percentage.toFixed(1)}%
                         </div>
                       </div>
-                      <div className="w-20 text-sm text-muted-foreground text-right">
+                      <p className="w-24 text-xs text-muted-foreground text-right">
                         {score.votes.toLocaleString()} votes
-                      </div>
+                      </p>
                     </div>
                   ))}
               </div>
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

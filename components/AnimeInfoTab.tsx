@@ -144,7 +144,6 @@ export function AnimeInfoTab({ anime, characters }: AnimeInfoTabProps) {
               ))}
             </div>
           </div>
-          <hr />
         </>
       )}
     </div>

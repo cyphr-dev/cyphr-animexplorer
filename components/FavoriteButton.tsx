@@ -33,7 +33,9 @@ export function FavoriteButton({ anime }: FavoriteButtonProps) {
           isInFavorites ? "fill-current text-white" : "text-current"
         }`}
       />
-      <p>{isInFavorites ? "Remove from Favorites" : "Add to Favorites"}</p>
+      <p className="inline-block md:hidden lg:inline-block">
+        {isInFavorites ? "Remove from Favorites" : "Add to Favorites"}
+      </p>
     </Button>
   );
 }

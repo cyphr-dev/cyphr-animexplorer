@@ -276,7 +276,6 @@ export default function FavoritesAnimeList({
               <Button
                 type="button"
                 variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
                 onClick={() => setViewMode("grid")}
                 className="rounded-r-none w-1/2"
               >
@@ -286,7 +285,6 @@ export default function FavoritesAnimeList({
               <Button
                 type="button"
                 variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
                 onClick={() => setViewMode("list")}
                 className="rounded-l-none w-1/2"
               >
@@ -352,7 +350,7 @@ export default function FavoritesAnimeList({
 
       <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
         {/* Desktop Search and Filters */}
-        <div className="hidden md:block col-span-2">
+        <div className="hidden lg:block col-span-2">
           <AnimeSearchBar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -383,7 +381,7 @@ export default function FavoritesAnimeList({
             hasActiveFilters={hasActiveFilters}
           />
         </div>
-        <div className="col-span-1 md:col-span-8">
+        <div className="col-span-1 md:col-span-10 lg:col-span-8">
           {/* Results */}
           {filteredAnimeList.length === 0 && favorites.length > 0 && (
             <div className="text-center py-12">

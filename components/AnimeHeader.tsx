@@ -58,9 +58,9 @@ export default function AnimeHeader() {
               />
               <span className="hidden md:inline">Favorites</span>
               {favorites.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {favorites.length > 99 ? "99+" : favorites.length}
-                </span>
+                <p className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center">
+                  {favorites.length > 50 ? ":)" : favorites.length}
+                </p>
               )}
             </Button>
           </Link>

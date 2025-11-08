@@ -68,7 +68,7 @@ export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="px-4 space-y-1">
+        <CardContent className="px-2 space-y-1">
           <h5 className="line-clamp-1">{anime.title}</h5>
           <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
             {anime.type && (
@@ -78,7 +78,7 @@ export function AnimeCard({ anime, isLoading = false }: AnimeCardProps) {
             )}
           </div>
         </CardContent>
-        <CardFooter className="p-4 flex items-center justify-between">
+        <CardFooter className="p-2 flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <p className="font-semibold">
