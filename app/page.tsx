@@ -1,55 +1,64 @@
+import AnimeHero from "@/components/AnimeHero";
+import AnimeCategorySection from "@/components/AnimeCategorySection";
+import AnimeEmptyState from "@/components/AnimeEmptyState";
+import { AlertCircle } from "lucide-react";
 import {
   fetchTopAnime,
   fetchCurrentlyAiring,
-  fetchAnimeByTypeAndStatus,
+  fetchAnimeList,
 } from "@/lib/api/jikan";
-import AnimeCategorySection from "@/components/AnimeCategorySection";
-import AnimeEmptyState from "@/components/AnimeEmptyState";
-import AnimeHero from "@/components/AnimeHero";
-import { AlertCircle } from "lucide-react";
-
-// Add a delay utility to avoid rate limiting
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function Home() {
-  // Load categories sequentially to avoid rate limiting
-  let newestAnime = null;
-  let newestError = false;
-  try {
-    newestAnime = await fetchCurrentlyAiring();
-    await delay(1000); // Wait 1 second between requests
-  } catch (error) {
-    console.error("Error loading newest anime:", error);
-    newestError = true;
-  }
-
+  // Fetch initial data on server for SSR
   let popularAnime = null;
-  let popularError = false;
-  try {
-    popularAnime = await fetchTopAnime("bypopularity");
-    await delay(1000);
-  } catch (error) {
-    console.error("Error loading popular anime:", error);
-    popularError = true;
-  }
-
+  let newestAnime = null;
   let latestSeries = null;
-  let seriesError = false;
-  try {
-    latestSeries = await fetchAnimeByTypeAndStatus("tv");
-    await delay(1000);
-  } catch (error) {
-    console.error("Error loading latest series:", error);
-    seriesError = true;
-  }
-
   let latestMovies = null;
-  let moviesError = false;
+  let hasError = false;
+
   try {
-    latestMovies = await fetchAnimeByTypeAndStatus("movie");
+    // Fetch all data in parallel for faster SSR
+    const [popularResult, newestResult, seriesResult, moviesResult] =
+      await Promise.allSettled([
+        fetchTopAnime("bypopularity"),
+        fetchCurrentlyAiring(),
+        fetchAnimeList({
+          type: "tv",
+          order_by: "start_date",
+          sort: "desc",
+          limit: 10,
+        }),
+        fetchAnimeList({
+          type: "movie",
+          order_by: "start_date",
+          sort: "desc",
+          limit: 10,
+        }),
+      ]);
+
+    // Handle results
+    if (popularResult.status === "fulfilled") {
+      popularAnime = popularResult.value;
+    }
+    if (newestResult.status === "fulfilled") {
+      newestAnime = newestResult.value;
+    }
+    if (seriesResult.status === "fulfilled") {
+      latestSeries = seriesResult.value.data;
+    }
+    if (moviesResult.status === "fulfilled") {
+      latestMovies = moviesResult.value.data;
+    }
+
+    // Check if everything failed
+    hasError =
+      popularResult.status === "rejected" &&
+      newestResult.status === "rejected" &&
+      seriesResult.status === "rejected" &&
+      moviesResult.status === "rejected";
   } catch (error) {
-    console.error("Error loading latest movies:", error);
-    moviesError = true;
+    console.error("Error fetching home page data:", error);
+    hasError = true;
   }
 
   return (
@@ -58,7 +67,7 @@ export default async function Home() {
       <AnimeHero />
       <div className="container mx-auto px-4 pt-4 md:pt-8 flex flex-col gap-12">
         {/* Category Sections */}
-        {newestError && popularError && seriesError && moviesError ? (
+        {hasError ? (
           <AnimeEmptyState
             title="Unable to Load Content"
             description="We're having trouble loading anime data. Please try refreshing the page."
@@ -67,7 +76,7 @@ export default async function Home() {
         ) : (
           <div className="space-y-4">
             {/* Most Popular */}
-            {popularAnime && !popularError ? (
+            {popularAnime && (
               <AnimeCategorySection
                 title="Most Popular"
                 description="Fan favorites and trending anime"
@@ -75,37 +84,37 @@ export default async function Home() {
                 viewAllLink="/browse?order_by=popularity&sort=asc"
                 largerCards={true}
               />
-            ) : null}
+            )}
 
             {/* Newest Anime */}
-            {newestAnime && !newestError ? (
+            {newestAnime && (
               <AnimeCategorySection
                 title="Latest"
                 description="Currently airing anime this season"
                 animeList={newestAnime}
                 viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
               />
-            ) : null}
+            )}
 
             {/* Latest Series */}
-            {latestSeries && !seriesError ? (
+            {latestSeries && (
               <AnimeCategorySection
                 title="Latest Series"
                 description="Recent TV anime releases"
                 animeList={latestSeries}
                 viewAllLink="/browse?type=tv&order_by=start_date&sort=desc"
               />
-            ) : null}
+            )}
 
             {/* Latest Movies */}
-            {latestMovies && !moviesError ? (
+            {latestMovies && (
               <AnimeCategorySection
                 title="Latest Movies"
                 description="Recent anime movie releases"
                 animeList={latestMovies}
                 viewAllLink="/browse?type=movie&order_by=start_date&sort=desc"
               />
-            ) : null}
+            )}
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import AnimeHeader from "@/components/AnimeHeader";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import AnimeFooter from "@/components/AnimeFooter";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/lib/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -122,17 +123,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AnimeHeader />
-          <div className="overflow-x-clip">{children}</div>
-          <AnimeFooter />
-          <Toaster position="top-center" />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AnimeHeader />
+            <div className="overflow-x-clip">{children}</div>
+            <AnimeFooter />
+            <Toaster position="top-center" />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

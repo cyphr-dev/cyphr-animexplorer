@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AnimeSearchBarProps {
   // Search and filters
@@ -69,6 +70,7 @@ interface AnimeSearchBarProps {
   onGenreToggle: (genreId: number) => void;
   availableGenres: Array<{ mal_id: number; name: string }>;
   showGenreFilter?: boolean;
+  genresLoading?: boolean;
 
   // View mode
   viewMode: "grid" | "list";
@@ -125,6 +127,7 @@ export default function AnimeSearchBar({
   onGenreToggle,
   availableGenres,
   showGenreFilter = true,
+  genresLoading = false,
   viewMode,
   onViewModeChange,
   infiniteScrollEnabled = false,
@@ -331,50 +334,54 @@ export default function AnimeSearchBar({
           </SelectContent>
         </Select>
         {/* Genre Filter Dropdown */}
-        {showGenreFilter && availableGenres.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full">
-                <SlidersHorizontal className="w-4 h-4 mr-2" />
-                <p>Genres</p>
-                {selectedGenres.length > 0 && (
-                  <Badge className="ml-2" variant="secondary">
-                    {selectedGenres.length}
-                  </Badge>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 max-h-[400px]">
-              <DropdownMenuLabel>Select Genres</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className="px-2 pb-2">
-                <Input
-                  placeholder="Search genres..."
-                  value={genreSearchQuery}
-                  onChange={(e) => setGenreSearchQuery(e.target.value)}
-                  className="h-8"
-                />
-              </div>
-              <DropdownMenuSeparator />
-              <div className="overflow-y-auto max-h-[280px]">
-                {filteredGenres.map((genre) => (
-                  <DropdownMenuCheckboxItem
-                    key={genre.mal_id}
-                    checked={selectedGenres.includes(genre.mal_id)}
-                    onCheckedChange={() => onGenreToggle(genre.mal_id)}
-                  >
-                    {genre.name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-                {filteredGenres.length === 0 && (
-                  <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                    <p>No genres found</p>
-                  </div>
-                )}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {showGenreFilter &&
+          (genresLoading || availableGenres.length > 0) &&
+          (genresLoading ? (
+            <Skeleton className="h-10 w-full" />
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  <SlidersHorizontal className="w-4 h-4 mr-2" />
+                  <p>Genres</p>
+                  {selectedGenres.length > 0 && (
+                    <Badge className="ml-2" variant="secondary">
+                      {selectedGenres.length}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 max-h-[400px]">
+                <DropdownMenuLabel>Select Genres</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="px-2 pb-2">
+                  <Input
+                    placeholder="Search genres..."
+                    value={genreSearchQuery}
+                    onChange={(e) => setGenreSearchQuery(e.target.value)}
+                    className="h-8"
+                  />
+                </div>
+                <DropdownMenuSeparator />
+                <div className="overflow-y-auto max-h-[280px]">
+                  {filteredGenres.map((genre) => (
+                    <DropdownMenuCheckboxItem
+                      key={genre.mal_id}
+                      checked={selectedGenres.includes(genre.mal_id)}
+                      onCheckedChange={() => onGenreToggle(genre.mal_id)}
+                    >
+                      {genre.name}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                  {filteredGenres.length === 0 && (
+                    <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                      <p>No genres found</p>
+                    </div>
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
 
         {/* Active Filters Display */}
         {selectedGenres.length > 0 && (

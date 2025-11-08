@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { AnimeCard } from "@/components/AnimeCard";
 import { AnimeListCard } from "@/components/AnimeListCard";
-import { fetchAnimeList } from "@/lib/api/jikan";
-import { Anime } from "@/lib/types/anime";
+import { useInfiniteAnimeList, useGenres } from "@/lib/hooks/useAnime";
+import { FetchAnimeParams } from "@/lib/api/jikan";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { Button } from "@/components/ui/button";
@@ -22,33 +22,15 @@ import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "./ui/card";
 
-interface BrowseAnimeListProps {
-  initialData: Anime[];
-  initialPage: number;
-  initialGenres: Array<{ mal_id: number; name: string }>;
-}
-
-export default function BrowseAnimeList({
-  initialData,
-  initialPage,
-  initialGenres,
-}: BrowseAnimeListProps) {
+export default function BrowseAnimeList() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const [animeList, setAnimeList] = useState<Anime[]>(initialData);
-  const [page, setPage] = useState(initialPage);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // View state
   const [viewMode, setViewMode] = useState<"grid" | "list">(
@@ -93,6 +75,59 @@ export default function BrowseAnimeList({
   const observerTarget = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Build query params for React Query
+  const queryParams = useMemo(() => {
+    const params: Omit<FetchAnimeParams, "page"> = {
+      limit: 20,
+    };
+
+    if (debouncedSearch) params.q = debouncedSearch;
+    if (selectedType && selectedType !== "none") {
+      params.type = selectedType as FetchAnimeParams["type"];
+    }
+    if (selectedStatus && selectedStatus !== "none") {
+      params.status = selectedStatus as FetchAnimeParams["status"];
+    }
+    if (selectedRating && selectedRating !== "none") {
+      params.rating = selectedRating as FetchAnimeParams["rating"];
+    }
+    if (selectedGenres.length > 0) params.genres = selectedGenres.join(",");
+    if (minScore && minScore !== "none")
+      params.min_score = parseFloat(minScore);
+    params.sfw = sfwMode;
+    if (orderBy) params.order_by = orderBy as FetchAnimeParams["order_by"];
+    if (sortOrder) params.sort = sortOrder as FetchAnimeParams["sort"];
+
+    return params;
+  }, [
+    debouncedSearch,
+    selectedType,
+    selectedStatus,
+    selectedRating,
+    selectedGenres,
+    minScore,
+    sfwMode,
+    orderBy,
+    sortOrder,
+  ]);
+
+  // Use React Query hooks
+  const {
+    data: animeData,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteAnimeList(queryParams);
+
+  const { data: genres = [] } = useGenres();
+
+  // Flatten the pages data
+  const animeList = useMemo(() => {
+    return animeData?.pages.flatMap((page) => page.data) || [];
+  }, [animeData]);
+
   // Function to update URL params
   const updateURLParams = useCallback(
     (params: Record<string, string | number | null | undefined>) => {
@@ -134,131 +169,11 @@ export default function BrowseAnimeList({
     };
   }, [searchQuery]);
 
-  const fetchWithFilters = useCallback(
-    async (pageNum: number, reset: boolean = false) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const typeValue =
-          selectedType && selectedType !== "none" ? selectedType : undefined;
-        const statusValue =
-          selectedStatus && selectedStatus !== "none"
-            ? selectedStatus
-            : undefined;
-        const ratingValue =
-          selectedRating && selectedRating !== "none"
-            ? selectedRating
-            : undefined;
-        const minScoreValue =
-          minScore && minScore !== "none" ? parseFloat(minScore) : undefined;
-
-        const data = await fetchAnimeList({
-          page: pageNum,
-          limit: 20,
-          q: debouncedSearch || undefined,
-          type: typeValue as
-            | "tv"
-            | "movie"
-            | "ova"
-            | "special"
-            | "ona"
-            | "music"
-            | undefined,
-          status: statusValue as "airing" | "complete" | "upcoming" | undefined,
-          rating: ratingValue as
-            | "g"
-            | "pg"
-            | "pg13"
-            | "r17"
-            | "r"
-            | "rx"
-            | undefined,
-          sfw: sfwMode, // Filter out hentai content when enabled
-          genres:
-            selectedGenres.length > 0 ? selectedGenres.join(",") : undefined,
-          min_score: minScoreValue,
-          order_by: orderBy as
-            | "mal_id"
-            | "title"
-            | "start_date"
-            | "end_date"
-            | "episodes"
-            | "score"
-            | "scored_by"
-            | "rank"
-            | "popularity"
-            | "members"
-            | "favorites"
-            | undefined,
-          sort: sortOrder as "asc" | "desc" | undefined,
-        });
-
-        if (data.data && data.data.length > 0) {
-          if (reset) {
-            setAnimeList(data.data);
-          } else {
-            setAnimeList((prev) => {
-              const existingIds = new Set(prev.map((anime) => anime.mal_id));
-              const newAnime = data.data.filter(
-                (anime) => !existingIds.has(anime.mal_id)
-              );
-              return [...prev, ...newAnime];
-            });
-          }
-
-          setPage(pageNum);
-          setHasMore(data.pagination.has_next_page);
-        } else {
-          setHasMore(false);
-          if (reset) {
-            setAnimeList([]);
-          }
-        }
-      } catch (err) {
-        console.error("Error loading anime:", err);
-        setError("Failed to load anime. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [
-      debouncedSearch,
-      selectedType,
-      selectedStatus,
-      selectedRating,
-      selectedGenres,
-      minScore,
-      orderBy,
-      sortOrder,
-      sfwMode,
-    ]
-  );
-
-  // Reset and fetch when filters change
-  useEffect(() => {
-    setAnimeList([]);
-    setPage(1);
-    setHasMore(true);
-    setError(null);
-    fetchWithFilters(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    debouncedSearch,
-    selectedType,
-    selectedStatus,
-    selectedRating,
-    selectedGenres,
-    minScore,
-    orderBy,
-    sortOrder,
-    sfwMode,
-  ]);
-
   const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
-    await fetchWithFilters(page + 1);
-  }, [page, loading, hasMore, fetchWithFilters]);
+    if (!isFetchingNextPage && hasNextPage) {
+      await fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -267,7 +182,7 @@ export default function BrowseAnimeList({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           loadMore();
         }
       },
@@ -284,7 +199,7 @@ export default function BrowseAnimeList({
         observer.unobserve(currentTarget);
       }
     };
-  }, [loadMore, hasMore, loading, infiniteScrollEnabled]);
+  }, [loadMore, hasNextPage, isFetchingNextPage, infiniteScrollEnabled]);
 
   const handleGenreToggle = (genreId: number) => {
     setSelectedGenres((prev) => {
@@ -303,11 +218,11 @@ export default function BrowseAnimeList({
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSelectedType("");
-    setSelectedStatus("");
-    setSelectedRating("");
+    setSelectedType("none");
+    setSelectedStatus("none");
+    setSelectedRating("none");
     setSelectedGenres([]);
-    setMinScore("");
+    setMinScore("none");
 
     // Clear all filter params from URL
     router.push(pathname, { scroll: false });
@@ -317,11 +232,11 @@ export default function BrowseAnimeList({
   useEffect(() => {
     updateURLParams({
       q: debouncedSearch || null,
-      type: selectedType || null,
-      status: selectedStatus || null,
-      rating: selectedRating || null,
+      type: selectedType !== "none" ? selectedType : null,
+      status: selectedStatus !== "none" ? selectedStatus : null,
+      rating: selectedRating !== "none" ? selectedRating : null,
       genres: selectedGenres.length > 0 ? selectedGenres.join(",") : null,
-      min_score: minScore || null,
+      min_score: minScore !== "none" ? minScore : null,
       order_by: orderBy !== "popularity" ? orderBy : null,
       sort: sortOrder !== "asc" ? sortOrder : null,
       view: viewMode !== "grid" ? viewMode : null,
@@ -345,11 +260,11 @@ export default function BrowseAnimeList({
 
   const hasActiveFilters = Boolean(
     searchQuery ||
-      selectedType ||
-      selectedStatus ||
-      selectedRating ||
+      (selectedType && selectedType !== "none") ||
+      (selectedStatus && selectedStatus !== "none") ||
+      (selectedRating && selectedRating !== "none") ||
       selectedGenres.length > 0 ||
-      minScore
+      (minScore && minScore !== "none")
   );
 
   const browseSortOptions = [
@@ -360,6 +275,27 @@ export default function BrowseAnimeList({
     { value: "end_date", label: "End Date" },
     { value: "favorites", label: "Favorites" },
   ];
+
+  // Show loading state for initial load
+  if (isLoading && !animeList.length) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading anime...</span>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <AnimeEmptyState
+        title="Unable to Load Anime Data"
+        description="Failed to load anime data. Please try again later."
+        icon={<AlertCircle className="w-24 h-24 text-destructive" />}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -442,7 +378,7 @@ export default function BrowseAnimeList({
                     sortOptions={browseSortOptions}
                     selectedGenres={selectedGenres}
                     onGenreToggle={handleGenreToggle}
-                    availableGenres={initialGenres}
+                    availableGenres={genres}
                     showGenreFilter={true}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
@@ -491,7 +427,7 @@ export default function BrowseAnimeList({
             sortOptions={browseSortOptions}
             selectedGenres={selectedGenres}
             onGenreToggle={handleGenreToggle}
-            availableGenres={initialGenres}
+            availableGenres={genres}
             showGenreFilter={true}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -510,7 +446,7 @@ export default function BrowseAnimeList({
 
         <div className="col-span-1 md:col-span-10 lg:col-span-8">
           {/* Results */}
-          {animeList.length === 0 && !loading && (
+          {animeList.length === 0 && !isLoading && (
             <AnimeEmptyState
               title="No Anime Found"
               description={
@@ -542,7 +478,7 @@ export default function BrowseAnimeList({
           )}
 
           {/* Loading indicator */}
-          {loading && (
+          {(isLoading || isFetchingNextPage) && (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
               <span className="ml-2 text-muted-foreground">
@@ -553,8 +489,8 @@ export default function BrowseAnimeList({
 
           {/* Load More Button (when infinite scroll is disabled) */}
           {!infiniteScrollEnabled &&
-            hasMore &&
-            !loading &&
+            hasNextPage &&
+            !isFetchingNextPage &&
             animeList.length > 0 && (
               <div className="flex justify-center py-8">
                 <Button onClick={loadMore} size="lg">
@@ -564,16 +500,18 @@ export default function BrowseAnimeList({
             )}
 
           {/* Error message */}
-          {error && (
+          {isError && (
             <Alert variant="destructive" className="mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>
+                Failed to load anime. Please try again.
+              </AlertDescription>
             </Alert>
           )}
 
           {/* End of content message */}
-          {!hasMore && !loading && animeList.length > 0 && (
+          {!hasNextPage && !isLoading && animeList.length > 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <p>You&apos;ve reached the end! 🎉</p>
               <p className="text-sm mt-2">Loaded {animeList.length} anime</p>

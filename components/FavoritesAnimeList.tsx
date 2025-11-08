@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { AnimeCard } from "@/components/AnimeCard";
 import { AnimeListCard } from "@/components/AnimeListCard";
 import { useFavoritesStore } from "@/lib/store";
+import { useGenres } from "@/lib/hooks/useAnime";
 import { Button } from "@/components/ui/button";
 import AnimeSearchBar from "@/components/AnimeSearchBar";
 import { Trash2, Heart, Filter, Search, Grid3x3, List } from "lucide-react";
@@ -21,14 +22,9 @@ import {
 import Link from "next/link";
 import { Card, CardContent } from "./ui/card";
 
-interface FavoritesAnimeListProps {
-  initialGenres: Array<{ mal_id: number; name: string }>;
-}
-
-export default function FavoritesAnimeList({
-  initialGenres,
-}: FavoritesAnimeListProps) {
+export default function FavoritesAnimeList() {
   const { favorites, clearFavorites } = useFavoritesStore();
+  const { data: allGenres = [], isLoading: genresLoading } = useGenres();
 
   // View state
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -178,12 +174,13 @@ export default function FavoritesAnimeList({
 
   // Get available genres from favorites
   const availableGenres = useMemo(() => {
+    if (genresLoading) return [];
     const genreIds = new Set<number>();
     favoriteAnimeList.forEach((anime) => {
       anime.genres.forEach((genre) => genreIds.add(genre.mal_id));
     });
-    return initialGenres.filter((genre) => genreIds.has(genre.mal_id));
-  }, [favoriteAnimeList, initialGenres]);
+    return allGenres.filter((genre: { mal_id: number; name: string }) => genreIds.has(genre.mal_id));
+  }, [favoriteAnimeList, allGenres, genresLoading]);
 
   // Get available types from favorites
   const availableTypes = useMemo(() => {
@@ -332,7 +329,8 @@ export default function FavoritesAnimeList({
                     selectedGenres={selectedGenres}
                     onGenreToggle={handleGenreToggle}
                     availableGenres={availableGenres}
-                    showGenreFilter={availableGenres.length > 0}
+                    showGenreFilter={availableGenres.length > 0 || genresLoading}
+                    genresLoading={genresLoading}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
                     showInfiniteScrollToggle={false}
@@ -372,7 +370,8 @@ export default function FavoritesAnimeList({
             selectedGenres={selectedGenres}
             onGenreToggle={handleGenreToggle}
             availableGenres={availableGenres}
-            showGenreFilter={availableGenres.length > 0}
+            showGenreFilter={availableGenres.length > 0 || genresLoading}
+            genresLoading={genresLoading}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             showInfiniteScrollToggle={false}

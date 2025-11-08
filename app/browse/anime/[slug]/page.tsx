@@ -1,7 +1,6 @@
 import {
   fetchAnimeById,
   fetchAnimeRelations,
-  fetchAnimeByIds,
   fetchAnimeCharacters,
   fetchAnimePictures,
   fetchAnimeVideos,
@@ -110,7 +109,7 @@ export default async function AnimeDetailsPage({
 
   let anime: Anime;
   let relations: AnimeRelation[] | null = null;
-  let relatedAnimeData: Anime[] = [];
+  const relatedAnimeData: Anime[] = [];
   let characters: Character[] = [];
   let pictures: AnimePicture[] = [];
   let videos: AnimeVideos | null = null;
@@ -123,54 +122,36 @@ export default async function AnimeDetailsPage({
       notFound();
     }
 
-    // Fetch relations data
-    try {
-      relations = await fetchAnimeRelations(animeId);
+    // Fetch other data in parallel for faster SSR
+    const [
+      relationsResult,
+      charactersResult,
+      picturesResult,
+      videosResult,
+      statisticsResult,
+    ] = await Promise.allSettled([
+      fetchAnimeRelations(animeId),
+      fetchAnimeCharacters(animeId),
+      fetchAnimePictures(animeId),
+      fetchAnimeVideos(animeId),
+      fetchAnimeStatistics(animeId),
+    ]);
 
-      // Extract all anime IDs from relations
-      if (relations && relations.length > 0) {
-        const animeIds = relations
-          .flatMap((rel) => rel.entry)
-          .filter((entry) => entry.type === "anime")
-          .map((entry) => entry.mal_id);
-
-        // Fetch anime data for images
-        if (animeIds.length > 0) {
-          const fetchedData = await fetchAnimeByIds(animeIds);
-          // Filter out null/undefined values
-          relatedAnimeData = fetchedData.filter(
-            (anime): anime is Anime => anime !== null && anime !== undefined
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching relations:", error);
+    // Handle results
+    if (relationsResult.status === "fulfilled") {
+      relations = relationsResult.value;
     }
-
-    // Fetch characters data
-    try {
-      characters = await fetchAnimeCharacters(animeId);
-    } catch (error) {
-      console.error("Error fetching characters:", error);
+    if (charactersResult.status === "fulfilled") {
+      characters = charactersResult.value;
     }
-
-    // Fetch additional media content
-    try {
-      pictures = await fetchAnimePictures(animeId);
-    } catch (error) {
-      console.error("Error fetching pictures:", error);
+    if (picturesResult.status === "fulfilled") {
+      pictures = picturesResult.value;
     }
-
-    try {
-      videos = await fetchAnimeVideos(animeId);
-    } catch (error) {
-      console.error("Error fetching videos:", error);
+    if (videosResult.status === "fulfilled") {
+      videos = videosResult.value;
     }
-
-    try {
-      statistics = await fetchAnimeStatistics(animeId);
-    } catch (error) {
-      console.error("Error fetching statistics:", error);
+    if (statisticsResult.status === "fulfilled") {
+      statistics = statisticsResult.value;
     }
   } catch (error) {
     console.error("Error fetching anime details:", error);
