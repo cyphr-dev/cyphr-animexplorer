@@ -1,13 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Anime, Character } from "@/lib/types/anime";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AnimeInfoTabProps {
   anime: Anime;
   characters: Character[];
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-export function AnimeInfoTab({ anime, characters }: AnimeInfoTabProps) {
+export function AnimeInfoTab({
+  anime,
+  characters,
+  isLoading = false,
+  error,
+}: AnimeInfoTabProps) {
   return (
     <div className="space-y-6">
       {/* Synopsis Section */}
@@ -65,87 +73,117 @@ export function AnimeInfoTab({ anime, characters }: AnimeInfoTabProps) {
       </>
 
       {/* Characters Section */}
-      {characters && characters.length > 0 && (
-        <>
-          <div className="flex flex-col gap-6">
-            <h3>Characters & Voice Actors</h3>
+      <div className="flex flex-col gap-6">
+        <h3>Characters & Voice Actors</h3>
 
-            <div className="grid grid-cols-1">
-              {characters.slice(0, 12).map((char) => (
-                <div
-                  key={char.character.mal_id}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  {/* Character Info */}
-                  <div className="flex items-center gap-3 flex-1">
+        {isLoading && (
+          <div className="grid grid-cols-1 gap-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4 p-3">
+                <Skeleton className="w-16 h-16 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="w-16 h-16 rounded-full shrink-0" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>Failed to load characters data.</p>
+            <p className="text-sm">Please try refreshing the page.</p>
+          </div>
+        )}
+
+        {!isLoading && !error && characters && characters.length > 0 && (
+          <div className="grid grid-cols-1">
+            {characters.slice(0, 12).map((char) => (
+              <div
+                key={char.character.mal_id}
+                className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                {/* Character Info */}
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
+                    <Image
+                      src={
+                        char.character.images.webp.image_url ||
+                        char.character.images.jpg.image_url
+                      }
+                      alt={char.character.name}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {char.character.url ? (
+                      <Link
+                        href={char.character.url}
+                        target="_blank"
+                        className="hover:text-primary transition-colors line-clamp-1"
+                      >
+                        <h5>{char.character.name}</h5>
+                      </Link>
+                    ) : (
+                      <h5 className="line-clamp-1">{char.character.name}</h5>
+                    )}
+                    <p className="text-sm text-muted-foreground">{char.role}</p>
+                  </div>
+                </div>
+
+                {/* Voice Actor Info */}
+                {char.voice_actors && char.voice_actors.length > 0 && (
+                  <div className="flex items-center gap-3 flex-1 justify-end">
+                    <div className="text-right min-w-0">
+                      {char.voice_actors[0].person.url ? (
+                        <Link
+                          href={char.voice_actors[0].person.url}
+                          target="_blank"
+                          className="hover:text-primary transition-colors line-clamp-1 block"
+                        >
+                          <h5>{char.voice_actors[0].person.name}</h5>
+                        </Link>
+                      ) : (
+                        <span className="line-clamp-1 block">
+                          <h5>{char.voice_actors[0].person.name}</h5>
+                        </span>
+                      )}
+                      <p className="text-muted-foreground">
+                        {char.voice_actors[0].language}
+                      </p>
+                    </div>
                     <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
                       <Image
-                        src={
-                          char.character.images.webp.image_url ||
-                          char.character.images.jpg.image_url
-                        }
-                        alt={char.character.name}
+                        src={char.voice_actors[0].person.images.jpg.image_url}
+                        alt={char.voice_actors[0].person.name}
                         fill
                         className="object-cover"
                         sizes="64px"
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      {char.character.url ? (
-                        <Link
-                          href={char.character.url}
-                          target="_blank"
-                          className="hover:text-primary transition-colors line-clamp-1"
-                        >
-                          <h5>{char.character.name}</h5>
-                        </Link>
-                      ) : (
-                        <h5 className="line-clamp-1">{char.character.name}</h5>
-                      )}
-                      <p className="text-sm text-muted-foreground">
-                        {char.role}
-                      </p>
-                    </div>
                   </div>
-
-                  {/* Voice Actor Info */}
-                  {char.voice_actors && char.voice_actors.length > 0 && (
-                    <div className="flex items-center gap-3 flex-1 justify-end">
-                      <div className="text-right min-w-0">
-                        {char.voice_actors[0].person.url ? (
-                          <Link
-                            href={char.voice_actors[0].person.url}
-                            target="_blank"
-                            className="hover:text-primary transition-colors line-clamp-1 block"
-                          >
-                            <h5>{char.voice_actors[0].person.name}</h5>
-                          </Link>
-                        ) : (
-                          <span className="line-clamp-1 block">
-                            <h5>{char.voice_actors[0].person.name}</h5>
-                          </span>
-                        )}
-                        <p className="text-muted-foreground">
-                          {char.voice_actors[0].language}
-                        </p>
-                      </div>
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted shrink-0">
-                        <Image
-                          src={char.voice_actors[0].person.images.jpg.image_url}
-                          alt={char.voice_actors[0].person.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            ))}
           </div>
-        </>
-      )}
+        )}
+
+        {!isLoading && !error && (!characters || characters.length === 0) && (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No character data available.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
