@@ -8,6 +8,11 @@ export default function AnimeDetailsLoading() {
         {/* Sidebar Skeleton */}
         <div className="md:col-span-2">
           <div className="space-y-4">
+            {/* Title Skeleton */}
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
             {/* Poster Skeleton */}
             <Card className="overflow-hidden">
               <Skeleton className="aspect-3/4 w-full" />
@@ -39,6 +44,8 @@ export default function AnimeDetailsLoading() {
         <div className="md:col-span-7 flex flex-col gap-6">
           {/* Header Skeleton */}
           <div className="space-y-4">
+            {/* Youtube Skeleton */}
+            <Skeleton className="h-100 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-6 w-3/4" />
             <div className="flex flex-wrap gap-2">
@@ -95,7 +102,7 @@ export default function AnimeDetailsLoading() {
           <div className="sticky top-26">
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="text-center">
                       <Skeleton className="w-8 h-8 mx-auto mb-2" />

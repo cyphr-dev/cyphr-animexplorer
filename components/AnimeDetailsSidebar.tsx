@@ -1,19 +1,8 @@
-import {
-  Star,
-  Calendar,
-  Film,
-  Clock,
-  TrendingUp,
-  Heart,
-  Users,
-  PlayCircle,
-  AlertCircle,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, Film, Clock, PlayCircle, AlertCircle } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ClickablePoster } from "@/components/ClickablePoster";
-import { Badge } from "@/components/ui/badge";
 import { Anime } from "@/lib/types/anime";
+import Link from "next/link";
 
 interface AnimeDetailsHeaderProps {
   anime: Anime;
@@ -42,11 +31,15 @@ export function AnimeDetailsSidebar({ anime }: AnimeDetailsHeaderProps) {
 
           {/* Genres Section */}
           {anime.genres && anime.genres.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 mt-2">
               {anime.genres.map((genre) => (
-                <Badge key={genre.mal_id} className="" variant={"outline"}>
+                <Link
+                  key={genre.mal_id}
+                  href={`/browse?genres=${genre.mal_id}`}
+                  className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                >
                   {genre.name}
-                </Badge>
+                </Link>
               ))}
             </div>
           )}
