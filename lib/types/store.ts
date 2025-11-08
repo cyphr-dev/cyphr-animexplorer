@@ -21,29 +21,3 @@ export interface FavoritesState {
   isFavorite: (malId: number) => boolean;
   clearFavorites: () => void;
 }
-
-// Search & Filter Store Types
-export interface FilterState {
-  searchQuery: string;
-  selectedGenre: string | null;
-  selectedType: string | null;
-  selectedStatus: string | null;
-  minScore: number | null;
-  setSearchQuery: (query: string) => void;
-  setSelectedGenre: (genre: string | null) => void;
-  setSelectedType: (type: string | null) => void;
-  setSelectedStatus: (status: string | null) => void;
-  setMinScore: (score: number | null) => void;
-  clearFilters: () => void;
-}
-
-// Pagination Store Types
-export interface PaginationState {
-  currentPage: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  setCurrentPage: (page: number) => void;
-  setTotalPages: (total: number) => void;
-  setHasNextPage: (hasNext: boolean) => void;
-  resetPagination: () => void;
-}
