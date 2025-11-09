@@ -30,7 +30,7 @@ export default function AnimeHeader() {
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
               <Home className="w-4 h-4" />
-              <span className="hidden md:inline">Home</span>
+              <p className="hidden md:inline">Home</p>
             </Button>
           </Link>
 
@@ -41,7 +41,7 @@ export default function AnimeHeader() {
               className="h-9 w-9 sm:w-auto sm:px-4 rounded-full"
             >
               <Grid3x3 className="w-4 h-4" />
-              <span className="hidden md:inline">Browse</span>
+              <p className="hidden md:inline">Browse</p>
             </Button>
           </Link>
 
@@ -56,7 +56,7 @@ export default function AnimeHeader() {
                   pathname === "/favorites" ? "fill-current" : ""
                 }`}
               />
-              <span className="hidden md:inline">Favorites</span>
+              <p className="hidden md:inline">Favorites</p>
               {favorites.length > 0 && (
                 <p className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center">
                   {favorites.length > 50 ? ":)" : favorites.length}
