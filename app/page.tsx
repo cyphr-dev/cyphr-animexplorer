@@ -54,7 +54,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background md:-mt-20">
+    <div className="min-h-screen bg-background sm:-mt-20">
       {/* Hero Section */}
       <AnimeHero />
       <div className="container mx-auto px-4 pt-4 md:pt-8 flex flex-col gap-12">
