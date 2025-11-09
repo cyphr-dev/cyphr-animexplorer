@@ -2,26 +2,20 @@ import AnimeHero from "@/components/AnimeHero";
 import AnimeCategorySection from "@/components/AnimeCategorySection";
 import AnimeEmptyState from "@/components/AnimeEmptyState";
 import { AlertCircle } from "lucide-react";
-import {
-  fetchTopAnime,
-  fetchCurrentlyAiring,
-  fetchAnimeList,
-} from "@/lib/api/jikan";
+import { fetchTopAnime, fetchAnimeList } from "@/lib/api/jikan";
 
 export default async function Home() {
   // Fetch initial data on server for SSR
   let popularAnime = null;
-  let newestAnime = null;
   let latestSeries = null;
   let latestMovies = null;
   let hasError = false;
 
   try {
     // Fetch all data in parallel for faster SSR
-    const [popularResult, newestResult, seriesResult, moviesResult] =
+    const [popularResult, seriesResult, moviesResult] =
       await Promise.allSettled([
         fetchTopAnime("bypopularity"),
-        fetchCurrentlyAiring(),
         fetchAnimeList({
           type: "tv",
           order_by: "start_date",
@@ -40,9 +34,6 @@ export default async function Home() {
     if (popularResult.status === "fulfilled") {
       popularAnime = popularResult.value;
     }
-    if (newestResult.status === "fulfilled") {
-      newestAnime = newestResult.value;
-    }
     if (seriesResult.status === "fulfilled") {
       latestSeries = seriesResult.value.data;
     }
@@ -53,7 +44,6 @@ export default async function Home() {
     // Check if everything failed
     hasError =
       popularResult.status === "rejected" &&
-      newestResult.status === "rejected" &&
       seriesResult.status === "rejected" &&
       moviesResult.status === "rejected";
   } catch (error) {
