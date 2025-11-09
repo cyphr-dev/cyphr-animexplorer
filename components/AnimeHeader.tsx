@@ -21,7 +21,7 @@ export default function AnimeHeader() {
           <h3>AnimeXplorer</h3>
         </Link>
 
-        <div className="flex flex-row gap-2 sm:gap-3 items-center">
+        <div className="flex flex-row gap-1 items-center bg-background/50 rounded-full p-1">
           {/* Navigation */}
           <Link href="/">
             <Button

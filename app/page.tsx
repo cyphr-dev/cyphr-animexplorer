@@ -18,12 +18,14 @@ export default async function Home() {
         fetchTopAnime("bypopularity"),
         fetchAnimeList({
           type: "tv",
+          status: "airing",
           order_by: "start_date",
           sort: "desc",
           limit: 10,
         }),
         fetchAnimeList({
           type: "movie",
+          status: "complete",
           order_by: "start_date",
           sort: "desc",
           limit: 10,
@@ -82,7 +84,7 @@ export default async function Home() {
                 title="Latest Series"
                 description="Recent TV anime releases"
                 animeList={latestSeries}
-                viewAllLink="/browse?type=tv&order_by=start_date&sort=desc"
+                viewAllLink="/browse?type=tv&status=airing&order_by=start_date&sort=desc"
               />
             )}
 
@@ -92,7 +94,7 @@ export default async function Home() {
                 title="Latest Movies"
                 description="Recent anime movie releases"
                 animeList={latestMovies}
-                viewAllLink="/browse?type=movie&order_by=start_date&sort=desc"
+                viewAllLink="/browse?type=movie&status=complete&order_by=start_date&sort=desc"
               />
             )}
           </div>
