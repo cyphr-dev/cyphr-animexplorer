@@ -86,16 +86,6 @@ export default async function Home() {
               />
             )}
 
-            {/* Newest Anime */}
-            {newestAnime && (
-              <AnimeCategorySection
-                title="Latest"
-                description="Currently airing anime this season"
-                animeList={newestAnime}
-                viewAllLink="/browse?status=airing&order_by=start_date&sort=desc"
-              />
-            )}
-
             {/* Latest Series */}
             {latestSeries && (
               <AnimeCategorySection
