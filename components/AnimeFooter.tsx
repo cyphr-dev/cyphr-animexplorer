@@ -9,7 +9,12 @@ export default function AnimeFooter() {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-lg">AnimeXplorer</h3>
+              <Link
+                href="/"
+                className="hover:opacity-80 transition-opacity bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+              >
+                <h3>AnimeXplorer</h3>
+              </Link>
             </div>
           </div>
 

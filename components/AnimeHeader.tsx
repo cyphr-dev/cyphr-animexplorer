@@ -13,12 +13,12 @@ export default function AnimeHeader() {
 
   return (
     <header className="w-full flex sm:px-4 justify-center sticky top-0 sm:top-3 z-50 container mx-auto">
-      <div className="flex justify-between w-full px-4 sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md border-1">
+      <div className="flex justify-between w-full px-4 sm:px-6 py-4  bg-gray-100/85 dark:bg-gray-800/85 sm:rounded-full items-center text-center backdrop-blur-md border">
         <Link
           href="/"
-          className="font-bold text-lg sm:text-xl hover:opacity-80 transition-opacity"
+          className="hover:opacity-80 transition-opacity bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
         >
-          AnimeXplorer
+          <h3>AnimeXplorer</h3>
         </Link>
 
         <div className="flex flex-row gap-2 sm:gap-3 items-center">
