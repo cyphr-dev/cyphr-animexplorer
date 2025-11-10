@@ -116,7 +116,7 @@ export default async function AnimeDetailsPage({
           {/* Lazy-loaded tabs */}
           <SmartAnimeTabs anime={anime} animeId={animeId} />
         </div>
-        <div className="md:col-span-2">
+        <div className="hidden md:block md:col-span-2">
           <div className="sticky top-26">
             <AnimeStatsGrid anime={anime} />
           </div>

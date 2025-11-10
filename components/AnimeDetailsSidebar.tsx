@@ -3,6 +3,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ClickablePoster } from "@/components/ClickablePoster";
 import { Anime } from "@/lib/types/anime";
 import Link from "next/link";
+import AnimeStatsGrid from "./AnimeStatsGrid";
 
 interface AnimeDetailsHeaderProps {
   anime: Anime;
@@ -26,6 +27,10 @@ export function AnimeDetailsSidebar({ anime }: AnimeDetailsHeaderProps) {
           {/* Clickable Poster */}
           <ClickablePoster anime={anime} />
           <hr />
+          <div className="block md:hidden">
+            <hr />
+            <AnimeStatsGrid anime={anime} />
+          </div>
           {/* Favorite Button */}
           <FavoriteButton anime={anime} />
           <hr />
