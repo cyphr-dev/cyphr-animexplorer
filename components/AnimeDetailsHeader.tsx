@@ -2,8 +2,7 @@ import { Anime } from "@/lib/types/anime";
 
 export default function AnimeDetailsHeader({ anime }: { anime: Anime }) {
   return (
-    <div className="w-full flex flex-col gap-6">
-      {/* Trailer Section */}
+    <>
       {anime.trailer?.embed_url && (
         <div className="relative aspect-video w-full rounded-lg overflow-clip">
           <iframe
@@ -15,6 +14,6 @@ export default function AnimeDetailsHeader({ anime }: { anime: Anime }) {
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
