@@ -21,6 +21,8 @@ export const animeKeys = {
   details: () => [...animeKeys.all, "detail"] as const,
   detail: (id: number) => [...animeKeys.details(), id] as const,
   relations: (id: number) => [...animeKeys.detail(id), "relations"] as const,
+  relatedAnime: (ids: number[]) =>
+    [...animeKeys.all, "related", ids.sort().join(",")] as const,
   characters: (id: number) => [...animeKeys.detail(id), "characters"] as const,
   pictures: (id: number) => [...animeKeys.detail(id), "pictures"] as const,
   videos: (id: number) => [...animeKeys.detail(id), "videos"] as const,
